@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ContactAppUZ</string>
+    <string name="contactRowFirstName">First name:</string>
+    <string name="contactRowLastName">Last name:</string>
+    <string name="contactRowAddress">Address:</string>
+    <string name="contactRowBirth">Birth date:</string>
 </resources>
