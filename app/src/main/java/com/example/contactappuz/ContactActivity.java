@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +30,7 @@ public class ContactActivity extends AppCompatActivity {
     List<Contact> contactList;
     MyAdapter adapter;
     ContactFiltr filtr = new ContactFiltr();
+    private Button filtrButton;
 
 
     @Override
