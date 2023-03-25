@@ -1,36 +1,38 @@
 package com.example.contactappuz;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothAdapter;
+//default done TODO moving to util
+/*import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
+import android.bluetooth.BluetoothSocket;*/
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+
+import com.example.contactappuz.util.Bluetooth;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-public class Bluetooth extends AppCompatActivity {
-    private static final String TAG = "Bluetooth";
-    static final UUID mUUID = UUID.fromString("");
+public class BluetoothActivity extends AppCompatActivity {
+    private static final String TAG = "BluetoothActivity";
+    //static final UUID mUUID = UUID.fromString("");
 
-    Button  mbtnForward, mbtnBack, mbtnRight, mbtnLeft, mbtnStop, mbtnConnect, mbtnCollect, mbttSendDB;
+    Button  /*mbtnForward, mbtnBack, mbtnRight, mbtnLeft,*/ mbtnStop, mbtnConnect, mbtnCollect, mbttSendDB;
 
-    PermissionChecker permissionChecker = new PermissionChecker(this);
+    //default done TODO moving to util
+    /*PermissionChecker permissionChecker = new PermissionChecker(this);
 
     BluetoothAdapter btAdapter;
     BluetoothDevice hc05;
-    BluetoothSocket btSocket = null;
-
+    BluetoothSocket btSocket = null;*/
+    Bluetooth bluetoothService = new Bluetooth(this);
     byte[] buffer = new byte[1024];
     int bytes;
     String Data="";
@@ -104,31 +106,33 @@ public class Bluetooth extends AppCompatActivity {
 
 
 
-
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
+//default done TODO moving to util
+        /*btAdapter = BluetoothAdapter.getDefaultAdapter();
         permissionChecker.checkPermissions();
-        hc05 = btAdapter.getRemoteDevice("");
+        hc05 = btAdapter.getRemoteDevice("");*/
 
 
         mbtnConnect.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("MissingPermission")
             @Override
             public void onClick(View view) {
-                try {
+                //done TODO moving to util
+                bluetoothService.mbtnConnect();
+                /*try {
                     permissionChecker.checkPermissions();
                     btSocket = hc05.createRfcommSocketToServiceRecord(mUUID);
                     btSocket.connect();
 //                    touchEventHelper = new TouchEventHelper(btSocket);
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
+                }*/
 
 
             }
         });
 
 //        touchEventHelper.setButtonOnTouchListener(mbtnForward, 70, 83);
-        mbtnForward.setOnTouchListener(new View.OnTouchListener() {
+        /*mbtnForward.setOnTouchListener(new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -227,22 +231,28 @@ public class Bluetooth extends AppCompatActivity {
             }
         });
 
+         */
+
         mbtnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
+                //done TODO moving to util
+                bluetoothService.mbtnStop();
+                /*try {
                     OutputStream outputStream = btSocket.getOutputStream();
                     outputStream.write(83);
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         });
 
         mbtnCollect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
+                //done TODO moving to util
+                bluetoothService.mbtnCollect();
+                /*try {
                     OutputStream outputStream = btSocket.getOutputStream();
                     outputStream.write(67);   //C
 
@@ -266,7 +276,7 @@ public class Bluetooth extends AppCompatActivity {
                     });
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         });
 
@@ -276,6 +286,7 @@ public class Bluetooth extends AppCompatActivity {
 
 
     public void startThread(String dane){
+        Log.d(TAG, "przesłana wiadomość: " + dane);
     //    AsyncTask.execute(() -> {
     //        try {
     //            ApiClient klient = new ApiClient();
@@ -285,7 +296,5 @@ public class Bluetooth extends AppCompatActivity {
     //        }
     //    });
     }
-
-
 
 }

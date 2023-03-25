@@ -1,4 +1,4 @@
-package com.example.contactappuz;
+package com.example.contactappuz.util;
 
         import android.Manifest;
         import android.app.Activity;
@@ -7,7 +7,7 @@ package com.example.contactappuz;
 
         import androidx.core.app.ActivityCompat;
 
-class PermissionChecker {
+public class PermissionChecker {
     private Context context;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
