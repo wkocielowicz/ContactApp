@@ -7,6 +7,12 @@ package com.example.contactappuz.util;
 
         import androidx.core.app.ActivityCompat;
 
+/**
+ * Jest odpowiedzialne za wygodniejszą obsługę pozwoleń. <br />
+ * Aby użyć - należy postawić obiekt w wybranej klasie i wywołać metodę w funkcji inicjalizacyjnej
+ * Wystarczy zignorować błędy, lub dodać atrybut {@code @SuppressLint("MissingPermission")}
+ * nad metodami z błędami, jednak nieprzewidziane są przypadki w których nie otrzymano zgody.
+ * */
 public class PermissionChecker {
     private Context context;
     private static String[] PERMISSIONS_STORAGE = {
@@ -27,6 +33,7 @@ public class PermissionChecker {
             Manifest.permission.BLUETOOTH_CONNECT,
             Manifest.permission.BLUETOOTH_PRIVILEGED
     };
+
     public PermissionChecker(Context context) {
         this.context = context;
     }
@@ -37,13 +44,14 @@ public class PermissionChecker {
         if (permission1 != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
             ActivityCompat.requestPermissions(
-                    (Activity)context,
+                    (Activity) context,
                     PERMISSIONS_STORAGE,
                     1
             );
-        } else if (permission2 != PackageManager.PERMISSION_GRANTED){
+        }
+        if (permission2 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
-                    (Activity)context,
+                    (Activity) context,
                     PERMISSIONS_LOCATION,
                     1
             );
