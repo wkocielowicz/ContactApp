@@ -11,8 +11,9 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
-import com.example.contactappuz.model.Contact;
-import com.example.contactappuz.util.ContactCategory;
+import com.example.contactappuz.activities.major.ContactActivity;
+import com.example.contactappuz.database.model.Contact;
+import com.example.contactappuz.util.enums.ContactCategoryEnum;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -38,9 +39,9 @@ public class ContactActivityTest {
         // Write sample data to Firebase before running tests
         DatabaseReference contactRef = FirebaseDatabase.getInstance().getReference("contacts");
         Contact[] contacts = new Contact[]{
-                new Contact(ContactCategory.FAMILY, "John", "Doe", "123 Family Street", "1990-01-01"),
-                new Contact(ContactCategory.FRIENDS, "Jane", "Smith", "456 Friends Avenue", "1991-02-02"),
-                new Contact(ContactCategory.WORK, "Bob", "Johnson", "789 Work Road", "1992-03-03")
+                new Contact(ContactCategoryEnum.FAMILY.getName(), "John", "Doe", "123 Family Street", "1990-01-01"),
+                new Contact(ContactCategoryEnum.FRIENDS.getName(), "Jane", "Smith", "456 Friends Avenue", "1991-02-02"),
+                new Contact(ContactCategoryEnum.WORK.getName(), "Bob", "Johnson", "789 Work Road", "1992-03-03")
         };
 
         Map<String, Object> contactsMap = new HashMap<>();

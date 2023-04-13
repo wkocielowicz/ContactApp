@@ -1,20 +1,21 @@
 package com.example.contactappuz.util;
 
-import com.example.contactappuz.model.Contact;
+import com.example.contactappuz.database.model.Contact;
+import com.example.contactappuz.util.enums.SortFieldEnum;
 
 import java.util.Comparator;
 
-public class ContactFiltr {
+public class ContactFilter {
 
     private String firstNameFiltr;
     private String lastNameFiltr;
     private String addressFiltr;
     private String birthDateFiltr;
 
-    private String fieldSort;
+    private SortFieldEnum fieldSort;
     private boolean ascendingSortOrder;
 
-    public ContactFiltr() {
+    public ContactFilter() {
     }
 
     public String getFirstNameFiltr() {
@@ -49,11 +50,11 @@ public class ContactFiltr {
         this.birthDateFiltr = birthDateFiltr;
     }
 
-    public String getFieldSort() {
+    public SortFieldEnum getFieldSort() {
         return fieldSort;
     }
 
-    public void setFieldSort(String fieldSort) {
+    public void setFieldSort(SortFieldEnum fieldSort) {
         this.fieldSort = fieldSort;
     }
 
@@ -72,16 +73,16 @@ public class ContactFiltr {
             comparator = Comparator.comparing(Contact::getFirstName, String.CASE_INSENSITIVE_ORDER);
         } else {
             switch (fieldSort) {
-                case "FirstName":
+                case FIRST_NAME:
                     comparator = Comparator.comparing(Contact::getFirstName, String.CASE_INSENSITIVE_ORDER);
                     break;
-                case "LastName":
+                case SECOND_NAME:
                     comparator = Comparator.comparing(Contact::getLastName, String.CASE_INSENSITIVE_ORDER);
                     break;
-                case "Address":
+                case ADDRESS:
                     comparator = Comparator.comparing(Contact::getAddress, String.CASE_INSENSITIVE_ORDER);
                     break;
-                case "BirthDate":
+                case BIRTH_DATE:
                     comparator = Comparator.comparing(Contact::getBirthDate);
                     break;
                 default:

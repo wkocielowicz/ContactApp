@@ -1,25 +1,20 @@
-package com.example.contactappuz;
+package com.example.contactappuz.activities.major;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.contactappuz.model.Contact;
-import com.example.contactappuz.util.ContactCategory;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.example.contactappuz.R;
+import com.example.contactappuz.activities.LanguageActivity;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.Random;
+import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends LanguageActivity {
 
-    private Button addContactButton, goToContactActivityButton;
+    private Button addContactButton, goToContactActivityButton, changeLanguageButton;
     private DatabaseReference contactRef;
 
     @Override
@@ -29,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
         addContactButton = findViewById(R.id.add_contact_button);
         goToContactActivityButton = findViewById(R.id.go_to_contact_activity_button);
+        changeLanguageButton = findViewById(R.id.change_language_button);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         contactRef = database.getReference("contacts");
@@ -46,29 +42,23 @@ public class MainActivity extends AppCompatActivity {
                 goToContactActivity();
             }
         });
-    }
 
-    private void addSampleContact() {
-        // Choose a random ContactCategory from the available options
-        ContactCategory[] categories = ContactCategory.values();
-        Random random = new Random();
-        int randomIndex = random.nextInt(categories.length);
-        ContactCategory randomCategory = categories[randomIndex];
-
-        // Create a sample Contact
-        Contact sampleContact = new Contact(randomCategory, "Jan", "Nowak", "Warszawa 15", "10.10.2000");
-
-        // Add the sample Contact to Firebase
-        contactRef.push().setValue(sampleContact).addOnCompleteListener(new OnCompleteListener<Void>() {
+        changeLanguageButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    // Contact added successfully
+            public void onClick(View view) {
+                if (Locale.getDefault().getLanguage().equals("pl")) {
+                    // Aktualnie wybrany jest język polski
+                    changeLanguage("en");
                 } else {
-                    // An error occurred while adding the contact
+                    // Aktualnie wybrany jest inny język
+                    changeLanguage("pl");
                 }
             }
         });
+    }
+
+    private void addSampleContact() {
+
     }
 
     private void goToContactActivity() {

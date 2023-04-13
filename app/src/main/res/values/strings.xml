@@ -1,7 +1,25 @@
 <resources>
+    <!-- ContactRow -->
     <string name="app_name">ContactAppUZ</string>
-    <string name="contactRowFirstName">First name:</string>
-    <string name="contactRowLastName">Last name:</string>
-    <string name="contactRowAddress">Address:</string>
-    <string name="contactRowBirth">Birth date:</string>
+    <string name="contactRowFirstName">First name: </string>
+    <string name="contactRowLastName">Last name: </string>
+    <string name="contactRowAddress">Address: </string>
+    <string name="contactRowBirth">Birth date: </string>
+
+    <!-- Main -->
+    <string name="mainSwitchLanguage">Switch language</string>
+
+    <!-- AddContact -->
+    <string name="addContactFirstNameHint">First name</string>
+    <string name="addContactLastNameHint">Last name</string>
+    <string name="addContactAddressHint">Address</string>
+    <string name="addContactBirthDateHint">Birth date</string>
+    <string name="addContactClearButton">Clear</string>
+    <string name="addContactAcceptButton">Accept</string>
+    <string name="addContactBackButton">Back</string>
+
+    <!-- Contact -->
+    <string name="contactFilter">Filter</string>
+    <string name="contactAdd">Add</string>
+
 </resources>

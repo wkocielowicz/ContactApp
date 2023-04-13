@@ -19,12 +19,12 @@
             android:layout_gravity="center_vertical">
 
             <TextView
-                android:layout_width="wrap_content"
+                style="bold"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/contactRowFirstName"
-                android:textSize="24dp"
                 android:textColor="@color/black"
-                style="bold"/>
+                android:textSize="24dp" />
 
             <TextView
                 android:id="@+id/textFirstName"

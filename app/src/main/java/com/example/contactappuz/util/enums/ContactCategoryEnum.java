@@ -1,6 +1,6 @@
-package com.example.contactappuz.util;
+package com.example.contactappuz.util.enums;
 
-public enum ContactCategory {
+public enum ContactCategoryEnum {
     FAMILY("Family"),
     FRIENDS("Friends"),
     WORK("Work"),
@@ -8,7 +8,7 @@ public enum ContactCategory {
 
     private String name;
 
-    private ContactCategory(String name) {
+    private ContactCategoryEnum(String name) {
         this.name = name;
     }
 
