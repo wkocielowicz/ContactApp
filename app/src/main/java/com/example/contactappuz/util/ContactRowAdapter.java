@@ -1,8 +1,6 @@
 package com.example.contactappuz.util;
 
-
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,17 +12,24 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.contactappuz.R;
-import com.example.contactappuz.model.Contact;
+import com.example.contactappuz.database.model.Contact;
 
 import java.util.List;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+public class ContactRowAdapter extends RecyclerView.Adapter<ContactRowAdapter.MyViewHolder> {
 
     private Context context;
     private List<Contact> contactList;
+    private OnItemClickListener onItemClickListener;
 
-    public MyAdapter(List<Contact> contactList) {
+    public interface OnItemClickListener {
+        void onUpdateButtonClick(Contact contact);
+        void onDeleteButtonClick(Contact contact);
+    }
+
+    public ContactRowAdapter(List<Contact> contactList, OnItemClickListener onItemClickListener) {
         this.contactList = contactList;
+        this.onItemClickListener = onItemClickListener;
     }
 
     public void updateContacts(List<Contact> updatedContacts) {
@@ -47,7 +52,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         holder.lastName.setText(contact.getLastName());
         holder.address.setText(contact.getAddress());
         holder.birthDate.setText(contact.getBirthDate());
-        holder.category.setText(contact.getCategory().getName());
+        holder.category.setText(contact.getCategory());
     }
 
     @Override
@@ -77,14 +82,21 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d("Delete", "Delete");
+                    if (onItemClickListener != null) {
+                        int position = getAdapterPosition();
+                        Contact contact = contactList.get(position);
+                        onItemClickListener.onDeleteButtonClick(contact);
+                    }
                 }
             });
 
             updateButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d("Update", "Update");
+                    if (onItemClickListener != null) {
+                        Contact contact = contactList.get(getAdapterPosition());
+                        onItemClickListener.onUpdateButtonClick(contact);
+                    }
                 }
             });
         }

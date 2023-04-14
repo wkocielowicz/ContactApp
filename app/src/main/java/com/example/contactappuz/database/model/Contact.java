@@ -1,20 +1,24 @@
-package com.example.contactappuz.model;
+package com.example.contactappuz.database.model;
 
 import androidx.annotation.NonNull;
 
-import com.example.contactappuz.util.ContactCategory;
+import java.io.Serializable;
+import java.util.UUID;
 
-public class Contact {
-    private ContactCategory category;
+public class Contact implements Serializable {
+    private String contactId;
+    private String category;
     private String firstName;
     private String lastName;
     private String address;
     private String birthDate;
 
     public Contact() {
+        this.contactId = UUID.randomUUID().toString();
     }
 
-    public Contact(ContactCategory category, String firstName, String lastName, String address, String birthDate) {
+    public Contact(String category, String firstName, String lastName, String address, String birthDate) {
+        this.contactId = UUID.randomUUID().toString();
         this.category = category;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -22,11 +26,15 @@ public class Contact {
         this.birthDate = birthDate;
     }
 
-    public ContactCategory getCategory() {
+    public String getContactId() { return contactId; }
+
+    public void setContactId(String contactId) { this.contactId = contactId; }
+
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(ContactCategory category) {
+    public void setCategory(String category) {
         this.category = category;
     }
 
