@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import com.example.contactappuz.database.model.Contact;
 import com.example.contactappuz.util.ContactFilter;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -66,21 +65,49 @@ public class FireBaseService {
                 if (!task.isSuccessful()) {
                     Toast.makeText(activity, "Failed to add contact", Toast.LENGTH_SHORT).show();
                 }
-                // Invoke the onTaskCompleted Consumer
                 onTaskCompleted.accept(task);
             }
         });
     }
 
+    public static void updateContact(Activity activity, String contactId, Contact contact, Consumer<Task<Void>> onTaskCompleted) {
+        CONTACT_REF.orderByChild("contactId").equalTo(contactId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot contactSnapshot : dataSnapshot.getChildren()) {
+                    contactSnapshot.getRef().setValue(contact).addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(activity, "Failed to update contact", Toast.LENGTH_SHORT).show();
+                        }
+                        onTaskCompleted.accept(task);
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("FirebaseError", "Failed to find contact: " + databaseError.getMessage());
+            }
+        });
+    }
+
     public static void deleteContact(String contactId, OnCompleteListener<Void> onCompleteListener) {
-        DatabaseReference contactRef = FirebaseDatabase.getInstance().getReference("contacts/" + contactId);
-        contactRef.removeValue()
-                .addOnCompleteListener(onCompleteListener)
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("FirebaseError", "Failed to delete contact: " + e.getMessage());
-                    }
-                });
+        DatabaseReference contactsRef = FirebaseDatabase.getInstance().getReference("contacts");
+
+        contactsRef.orderByChild("contactId").equalTo(contactId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot contactSnapshot : dataSnapshot.getChildren()) {
+                    contactSnapshot.getRef().removeValue()
+                            .addOnCompleteListener(onCompleteListener)
+                            .addOnFailureListener(e -> Log.e("FirebaseError", "Failed to delete contact: " + e.getMessage()));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("FirebaseError", "Failed to find contact: " + databaseError.getMessage());
+            }
+        });
     }
 }

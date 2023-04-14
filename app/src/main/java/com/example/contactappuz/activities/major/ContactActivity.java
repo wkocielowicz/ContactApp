@@ -72,7 +72,8 @@ public class ContactActivity extends LanguageActivity implements IActivity {
             public void onUpdateButtonClick(Contact contact) {
                 Intent intent = new Intent(ContactActivity.this, AddEditContactActivity.class);
                 intent.putExtra("mode", ActivityModeEnum.EDIT);
-                intent.putExtra("contact", contact); // Przesyłanie obiektu Contact jako parametr
+                intent.putExtra("contact", contact);
+                intent.putExtra("contactId", contact.getContactId());
                 startActivity(intent);
             }
 
@@ -130,7 +131,9 @@ public class ContactActivity extends LanguageActivity implements IActivity {
         addContactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(ContactActivity.this, AddEditContactActivity.class));
+                Intent intent = new Intent(ContactActivity.this, AddEditContactActivity.class);
+                intent.putExtra("mode", ActivityModeEnum.ADD);
+                startActivity(intent);
             }
         });
     }

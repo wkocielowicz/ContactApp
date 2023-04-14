@@ -1,11 +1,11 @@
 package com.example.contactappuz.activities.minor;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.contactappuz.R;
 import com.example.contactappuz.activities.IActivity;
@@ -62,16 +62,26 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
 
     @Override
     public void attachListeners() {
-        acceptButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Contact contact = loadFields();
+        acceptButton.setOnClickListener(view -> {
+            Contact contact = loadFields();
 
+            if (mode == ActivityModeEnum.ADD) {
                 FireBaseService.addContact(AddEditContactActivity.this, contact, task -> {
                     if (task.isSuccessful()) {
                         finish();
                     }
                 });
+            } else if (mode == ActivityModeEnum.EDIT) {
+                String contactId = getIntent().getStringExtra("contactId");
+                if (contactId != null) {
+                    FireBaseService.updateContact(AddEditContactActivity.this, contactId, contact, task -> {
+                        if (task.isSuccessful()) {
+                            finish();
+                        }
+                    });
+                } else {
+                    Toast.makeText(AddEditContactActivity.this, "Failed to update contact", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

@@ -10,13 +10,6 @@
     tools:context=".activities.major.MainActivity">
 
     <Button
-        android:id="@+id/add_contact_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Dodaj przykładowy kontakt"
-        android:layout_marginBottom="16dp" />
-
-    <Button
         android:id="@+id/go_to_contact_activity_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
