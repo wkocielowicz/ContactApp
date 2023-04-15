@@ -14,4 +14,12 @@
     <string name="addContactBackButton">Cofnij</string>
     <string name="contactFilter">Filtr</string>
     <string name="contactAdd">Dodaj</string>
+    <string name="loginTittle">Logowanie</string>
+    <string name="loginRegisterUser">Użytkownik</string>
+    <string name="loginRegisterPassword">Hasło</string>
+    <string name="loginRegisterSubmit">Potwierdź</string>
+    <string name="loginSwitchToRegister">Zarejestruj</string>
+    <string name="registrationTittle">Rejestracja</string>
+    <string name="registerSwitchToLogin">Zaloguj</string>
+    <string name="loginRegisterConfirmPassword">Potwierdź hasło</string>
 </resources>

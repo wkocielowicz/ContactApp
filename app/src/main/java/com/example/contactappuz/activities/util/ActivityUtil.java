@@ -4,6 +4,9 @@ import android.content.Context;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,5 +30,14 @@ public class ActivityUtil {
         ArrayAdapter<String> categorySpinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, categoryItems);
         categorySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(categorySpinnerAdapter);
+    }
+
+    public static String getUserId() {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            return currentUser.getUid();
+        }
+        return null;
     }
 }

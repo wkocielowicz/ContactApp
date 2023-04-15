@@ -27,8 +27,12 @@ public class FireBaseService {
     private FireBaseService() {
     }
 
-    public static void getContactsFromFirebase(Activity activity, String selectedCategory, ContactFilter contactFilter, Consumer<List<Contact>> onContactsFetched) {
-        CONTACT_REF.addValueEventListener(new ValueEventListener() {
+    private static DatabaseReference getReferenceForUser(String userId) {
+        return FirebaseDatabase.getInstance().getReference("users/" + userId + "/contacts");
+    }
+
+    public static void getContactsFromFirebase(Activity activity, String userId, String selectedCategory, ContactFilter contactFilter, Consumer<List<Contact>> onContactsFetched) {
+        getReferenceForUser(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Contact> contactList = new ArrayList<>();
@@ -58,20 +62,17 @@ public class FireBaseService {
         });
     }
 
-    public static void addContact(Activity activity, Contact contact, Consumer<Task<Void>> onTaskCompleted) {
-        CONTACT_REF.push().setValue(contact).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (!task.isSuccessful()) {
-                    Toast.makeText(activity, "Failed to add contact", Toast.LENGTH_SHORT).show();
-                }
-                onTaskCompleted.accept(task);
+    public static void addContact(Activity activity, String userId, Contact contact, Consumer<Task<Void>> onTaskCompleted) {
+        getReferenceForUser(userId).push().setValue(contact).addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Toast.makeText(activity, "Failed to add contact", Toast.LENGTH_SHORT).show();
             }
+            onTaskCompleted.accept(task);
         });
     }
 
-    public static void updateContact(Activity activity, String contactId, Contact contact, Consumer<Task<Void>> onTaskCompleted) {
-        CONTACT_REF.orderByChild("contactId").equalTo(contactId).addListenerForSingleValueEvent(new ValueEventListener() {
+    public static void updateContact(Activity activity, String userId, String contactId, Contact contact, Consumer<Task<Void>> onTaskCompleted) {
+        getReferenceForUser(userId).orderByChild("contactId").equalTo(contactId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot contactSnapshot : dataSnapshot.getChildren()) {
@@ -91,10 +92,10 @@ public class FireBaseService {
         });
     }
 
-    public static void deleteContact(String contactId, OnCompleteListener<Void> onCompleteListener) {
+    public static void deleteContact(String userId, String contactId, OnCompleteListener<Void> onCompleteListener) {
         DatabaseReference contactsRef = FirebaseDatabase.getInstance().getReference("contacts");
 
-        contactsRef.orderByChild("contactId").equalTo(contactId).addListenerForSingleValueEvent(new ValueEventListener() {
+        getReferenceForUser(userId).orderByChild("contactId").equalTo(contactId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot contactSnapshot : dataSnapshot.getChildren()) {
