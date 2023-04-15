@@ -7,7 +7,7 @@ import android.widget.Button;
 import com.example.contactappuz.R;
 import com.example.contactappuz.activities.IActivity;
 import com.example.contactappuz.activities.LanguageActivity;
-import com.example.contactappuz.util.enums.ActivityModeEnum;
+import com.example.contactappuz.util.enums.mode.ActivityModeEnum;
 
 import java.util.Locale;
 
@@ -23,18 +23,17 @@ public class MainActivity extends LanguageActivity implements IActivity {
         super.onCreate(savedInstanceState);
 
         mode = getIntentMode();
-        initializeComponents(mode);
+        initializeComponents();
 
         attachListeners();
     }
 
-    @Override
     public ActivityModeEnum getIntentMode() {
         return (ActivityModeEnum) getIntent().getSerializableExtra("mode");
     }
 
     @Override
-    public void initializeComponents(ActivityModeEnum mode) {
+    public void initializeComponents() {
         setContentView(R.layout.activity_main);
 
         goToContactActivityButton = findViewById(R.id.go_to_contact_activity_button);

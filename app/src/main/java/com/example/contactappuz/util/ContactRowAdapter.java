@@ -79,24 +79,18 @@ public class ContactRowAdapter extends RecyclerView.Adapter<ContactRowAdapter.My
             //photo.setImageResource(R.drawable.logo);
             //photo.setImageURI(Uri.parse("res/drawable/logo.png"));
 
-            deleteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (onItemClickListener != null) {
-                        int position = getAdapterPosition();
-                        Contact contact = contactList.get(position);
-                        onItemClickListener.onDeleteButtonClick(contact);
-                    }
+            deleteButton.setOnClickListener(view -> {
+                if (onItemClickListener != null) {
+                    int position = getAdapterPosition();
+                    Contact contact = contactList.get(position);
+                    onItemClickListener.onDeleteButtonClick(contact);
                 }
             });
 
-            updateButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (onItemClickListener != null) {
-                        Contact contact = contactList.get(getAdapterPosition());
-                        onItemClickListener.onUpdateButtonClick(contact);
-                    }
+            updateButton.setOnClickListener(view -> {
+                if (onItemClickListener != null) {
+                    Contact contact = contactList.get(getAdapterPosition());
+                    onItemClickListener.onUpdateButtonClick(contact);
                 }
             });
         }

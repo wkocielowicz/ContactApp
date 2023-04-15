@@ -21,8 +21,8 @@ import com.example.contactappuz.database.model.Contact;
 import com.example.contactappuz.logic.FireBaseService;
 import com.example.contactappuz.util.ContactFilter;
 import com.example.contactappuz.util.ContactRowAdapter;
-import com.example.contactappuz.util.enums.ActivityModeEnum;
 import com.example.contactappuz.util.enums.ContactCategoryEnum;
+import com.example.contactappuz.util.enums.mode.ActivityModeEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,18 +46,17 @@ public class ContactActivity extends LanguageActivity implements IActivity {
         super.onCreate(savedInstanceState);
 
         mode = getIntentMode();
-        initializeComponents(mode);
+        initializeComponents();
 
         attachListeners();
     }
 
-    @Override
     public ActivityModeEnum getIntentMode() {
         return (ActivityModeEnum) getIntent().getSerializableExtra("mode");
     }
 
     @Override
-    public void initializeComponents(ActivityModeEnum mode) {
+    public void initializeComponents() {
         setContentView(R.layout.activity_contact);
 
         filterButton = findViewById(R.id.filterButton);
@@ -79,7 +78,7 @@ public class ContactActivity extends LanguageActivity implements IActivity {
 
             @Override
             public void onDeleteButtonClick(Contact contact) {
-                FireBaseService.deleteContact(contact.getContactId(), task -> {
+                FireBaseService.deleteContact(ActivityUtil.getUserId(), contact.getContactId(), task -> {
                     if (task.isSuccessful()) {
                         getContactsFromFirebase(categorySpinner.getSelectedItem().toString());
                     }
@@ -103,7 +102,6 @@ public class ContactActivity extends LanguageActivity implements IActivity {
                 if (selectedItem.equals(CATEGORY_ALL)) {
                     getContactsFromFirebase(CATEGORY_ALL);
                 } else {
-                    ContactCategoryEnum selectedCategory = ContactCategoryEnum.valueOf(selectedItem);
                     getContactsFromFirebase(selectedItem);
                 }
             }
@@ -113,33 +111,27 @@ public class ContactActivity extends LanguageActivity implements IActivity {
             }
         });
 
-        filterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FilterDialog.OnFilterAppliedListener onFilterAppliedListener = new FilterDialog.OnFilterAppliedListener() {
-                    @Override
-                    public void onFilterApplied(ContactFilter contactFilter) {
-                        String selectedCategory = categorySpinner.getSelectedItem().toString();
-                        getContactsFromFirebase(selectedCategory);
-                    }
-                };
+        filterButton.setOnClickListener(v -> {
+            FilterDialog.OnFilterAppliedListener onFilterAppliedListener = new FilterDialog.OnFilterAppliedListener() {
+                @Override
+                public void onFilterApplied(ContactFilter contactFilter) {
+                    String selectedCategory = categorySpinner.getSelectedItem().toString();
+                    getContactsFromFirebase(selectedCategory);
+                }
+            };
 
-                FilterDialog.show(ContactActivity.this, contactFilter, onFilterAppliedListener);
-            }
+            FilterDialog.show(ContactActivity.this, contactFilter, onFilterAppliedListener);
         });
 
-        addContactButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(ContactActivity.this, AddEditContactActivity.class);
-                intent.putExtra("mode", ActivityModeEnum.ADD);
-                startActivity(intent);
-            }
+        addContactButton.setOnClickListener(view -> {
+            Intent intent = new Intent(ContactActivity.this, AddEditContactActivity.class);
+            intent.putExtra("mode", ActivityModeEnum.ADD);
+            startActivity(intent);
         });
     }
 
     private void getContactsFromFirebase(String selectedCategory) {
-        FireBaseService.getContactsFromFirebase(this, selectedCategory, contactFilter, newContacts -> {
+        FireBaseService.getContactsFromFirebase(this, ActivityUtil.getUserId(), selectedCategory, contactFilter, newContacts -> {
             adapter.updateContacts(newContacts);
         });
     }

@@ -13,8 +13,8 @@ import com.example.contactappuz.activities.LanguageActivity;
 import com.example.contactappuz.activities.util.ActivityUtil;
 import com.example.contactappuz.database.model.Contact;
 import com.example.contactappuz.logic.FireBaseService;
-import com.example.contactappuz.util.enums.ActivityModeEnum;
 import com.example.contactappuz.util.enums.ContactCategoryEnum;
+import com.example.contactappuz.util.enums.mode.ActivityModeEnum;
 
 public class AddEditContactActivity extends LanguageActivity implements IActivity {
 
@@ -32,18 +32,17 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
         super.onCreate(savedInstanceState);
 
         mode = getIntentMode();
-        initializeComponents(mode);
+        initializeComponents();
 
         attachListeners();
     }
 
-    @Override
     public ActivityModeEnum getIntentMode() {
         return (ActivityModeEnum) getIntent().getSerializableExtra("mode");
     }
 
     @Override
-    public void initializeComponents(ActivityModeEnum mode) {
+    public void initializeComponents() {
         setContentView(R.layout.activity_add_edit_contact);
 
         acceptButton = findViewById(R.id.acceptButton);
@@ -66,7 +65,7 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
             Contact contact = loadFields();
 
             if (mode == ActivityModeEnum.ADD) {
-                FireBaseService.addContact(AddEditContactActivity.this, contact, task -> {
+                FireBaseService.addContact(AddEditContactActivity.this, ActivityUtil.getUserId(), contact, task -> {
                     if (task.isSuccessful()) {
                         finish();
                     }
@@ -74,7 +73,7 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
             } else if (mode == ActivityModeEnum.EDIT) {
                 String contactId = getIntent().getStringExtra("contactId");
                 if (contactId != null) {
-                    FireBaseService.updateContact(AddEditContactActivity.this, contactId, contact, task -> {
+                    FireBaseService.updateContact(AddEditContactActivity.this, ActivityUtil.getUserId(), contactId, contact, task -> {
                         if (task.isSuccessful()) {
                             finish();
                         }

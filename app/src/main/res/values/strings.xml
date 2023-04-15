@@ -22,4 +22,14 @@
     <string name="contactFilter">Filter</string>
     <string name="contactAdd">Add</string>
 
+    <!-- Login/Register -->
+    <string name="loginRegisterUser">User</string>
+    <string name="loginRegisterPassword">Password</string>
+    <string name="loginRegisterSubmit">Submit</string>
+    <string name="loginTittle">Login</string>
+    <string name="loginSwitchToRegister">Register</string>
+    <string name="registrationTittle">Registration</string>
+    <string name="registerSwitchToLogin">Log in</string>
+    <string name="loginRegisterConfirmPassword">Confirm password</string>
+
 </resources>
