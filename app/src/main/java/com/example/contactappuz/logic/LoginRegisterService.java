@@ -16,4 +16,9 @@ public class LoginRegisterService {
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(onCompleteListener);
     }
+
+    //Only for tests
+    public static void setAuth(FirebaseAuth mAuth) {
+        auth = mAuth;
+    }
 }

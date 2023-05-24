@@ -19,6 +19,8 @@ import com.example.contactappuz.util.enums.mode.ActivityModeEnum;
 public class AddEditContactActivity extends LanguageActivity implements IActivity {
 
     private Button acceptButton;
+    private Button backButton;
+    private Button clearButton;
     private EditText firstNameEditText;
     private EditText lastNameEditText;
     private EditText addressEditText;
@@ -46,6 +48,8 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
         setContentView(R.layout.activity_add_edit_contact);
 
         acceptButton = findViewById(R.id.acceptButton);
+        backButton = findViewById(R.id.backButton);
+        clearButton = findViewById(R.id.clearButton);
         firstNameEditText = findViewById(R.id.firstNameEditText);
         lastNameEditText = findViewById(R.id.lastNameEditText);
         addressEditText = findViewById(R.id.addressEditText);
@@ -82,6 +86,20 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
                     Toast.makeText(AddEditContactActivity.this, "Failed to update contact", Toast.LENGTH_SHORT).show();
                 }
             }
+        });
+
+        backButton.setOnClickListener(view -> {
+            // Close the activity when the back button is pressed
+            finish();
+        });
+
+        clearButton.setOnClickListener(view -> {
+            // Clear all the fields when the clear button is pressed
+            firstNameEditText.setText("");
+            lastNameEditText.setText("");
+            addressEditText.setText("");
+            birthDateEditText.setText("");
+            categorySpinner.setSelection(0); // Set the spinner back to the default selection
         });
     }
 

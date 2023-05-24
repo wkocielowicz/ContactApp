@@ -31,5 +31,6 @@
     <string name="registrationTittle">Registration</string>
     <string name="registerSwitchToLogin">Log in</string>
     <string name="loginRegisterConfirmPassword">Confirm password</string>
+    <string name="passwords_do_not_match">The entered passwords do not match!</string>
 
 </resources>

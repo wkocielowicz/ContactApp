@@ -32,20 +32,20 @@ public class FilterDialog {
         final CheckBox ascendingSortCheckBox = view.findViewById(R.id.ascendingSortCheckBox);
         Spinner sortFieldSpinner = view.findViewById(R.id.sortFieldSpinner);
 
-        firstNameEditText.setText(contactFilter.getFirstNameFiltr());
-        lastNameEditText.setText(contactFilter.getLastNameFiltr());
-        addressEditText.setText(contactFilter.getAddressFiltr());
-        birthDateEditText.setText(contactFilter.getBirthDateFiltr());
+        firstNameEditText.setText(contactFilter.getFirstNameFilter());
+        lastNameEditText.setText(contactFilter.getLastNameFilter());
+        addressEditText.setText(contactFilter.getAddressFilter());
+        birthDateEditText.setText(contactFilter.getBirthDateFilter());
         ascendingSortCheckBox.setChecked(contactFilter.isAscendingSortOrder());
         setupSortFieldSpinner(context, sortFieldSpinner, contactFilter);
 
         builder.setPositiveButton("Filter", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                contactFilter.setFirstNameFiltr(firstNameEditText.getText().toString().trim());
-                contactFilter.setLastNameFiltr(lastNameEditText.getText().toString().trim());
-                contactFilter.setAddressFiltr(addressEditText.getText().toString().trim());
-                contactFilter.setBirthDateFiltr(birthDateEditText.getText().toString().trim());
+                contactFilter.setFirstNameFilter(firstNameEditText.getText().toString().trim());
+                contactFilter.setLastNameFilter(lastNameEditText.getText().toString().trim());
+                contactFilter.setAddressFilter(addressEditText.getText().toString().trim());
+                contactFilter.setBirthDateFilter(birthDateEditText.getText().toString().trim());
                 contactFilter.setFieldSort((SortFieldEnum) sortFieldSpinner.getSelectedItem());
                 contactFilter.setAscendingSortOrder(ascendingSortCheckBox.isChecked());
 
