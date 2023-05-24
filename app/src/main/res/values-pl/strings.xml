@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">ContactAppUZ</string>
+    <string name="contactRowFirstName">Imię: </string>
+    <string name="contactRowLastName">Nazwisko: </string>
+    <string name="contactRowAddress">Adres: </string>
+    <string name="contactRowBirth">Data urodzenia: </string>
+    <string name="mainSwitchLanguage">Zmień język</string>
+    <string name="addContactFirstNameHint">Imię:</string>
+    <string name="addContactLastNameHint">Nazwisko:</string>
+    <string name="addContactAddressHint">Adres:</string>
+    <string name="addContactBirthDateHint">Data urodzenia:</string>
+    <string name="addContactClearButton">Wyczyść</string>
+    <string name="addContactAcceptButton">Akceptuj</string>
+    <string name="addContactBackButton">Cofnij</string>
+    <string name="contactFilter">Filtr</string>
+    <string name="contactAdd">Dodaj</string>
+    <string name="loginTittle">Logowanie</string>
+    <string name="loginRegisterUser">Użytkownik</string>
+    <string name="loginRegisterPassword">Hasło</string>
+    <string name="loginRegisterSubmit">Potwierdź</string>
+    <string name="loginSwitchToRegister">Zarejestruj</string>
+    <string name="registrationTittle">Rejestracja</string>
+    <string name="registerSwitchToLogin">Zaloguj</string>
+    <string name="loginRegisterConfirmPassword">Potwierdź hasło</string>
+    <string name="passwords_do_not_match">Podane hasła nie są ze sobą zgodne!</string>
+</resources>
