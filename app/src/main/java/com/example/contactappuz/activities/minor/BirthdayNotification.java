@@ -53,6 +53,7 @@ public class BirthdayNotification extends LanguageActivity implements IActivity{
         if (!birthdayContactList.isEmpty()) {
             showBirthdayNotifications();
         }
+    //sdfsdfsdfsdfs
     }
 
     private void fetchContacts() {
