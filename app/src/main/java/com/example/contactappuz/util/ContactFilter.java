@@ -7,10 +7,10 @@ import java.util.Comparator;
 
 public class ContactFilter {
 
-    private String firstNameFiltr;
-    private String lastNameFiltr;
-    private String addressFiltr;
-    private String birthDateFiltr;
+    private String firstNameFilter;
+    private String lastNameFilter;
+    private String addressFilter;
+    private String birthDateFilter;
 
     private SortFieldEnum fieldSort;
     private boolean ascendingSortOrder;
@@ -18,36 +18,36 @@ public class ContactFilter {
     public ContactFilter() {
     }
 
-    public String getFirstNameFiltr() {
-        return firstNameFiltr;
+    public String getFirstNameFilter() {
+        return firstNameFilter;
     }
 
-    public void setFirstNameFiltr(String firstNameFiltr) {
-        this.firstNameFiltr = firstNameFiltr;
+    public void setFirstNameFilter(String firstNameFilter) {
+        this.firstNameFilter = firstNameFilter;
     }
 
-    public String getLastNameFiltr() {
-        return lastNameFiltr;
+    public String getLastNameFilter() {
+        return lastNameFilter;
     }
 
-    public void setLastNameFiltr(String lastNameFiltr) {
-        this.lastNameFiltr = lastNameFiltr;
+    public void setLastNameFilter(String lastNameFilter) {
+        this.lastNameFilter = lastNameFilter;
     }
 
-    public String getAddressFiltr() {
-        return addressFiltr;
+    public String getAddressFilter() {
+        return addressFilter;
     }
 
-    public void setAddressFiltr(String addressFiltr) {
-        this.addressFiltr = addressFiltr;
+    public void setAddressFilter(String addressFilter) {
+        this.addressFilter = addressFilter;
     }
 
-    public String getBirthDateFiltr() {
-        return birthDateFiltr;
+    public String getBirthDateFilter() {
+        return birthDateFilter;
     }
 
-    public void setBirthDateFiltr(String birthDateFiltr) {
-        this.birthDateFiltr = birthDateFiltr;
+    public void setBirthDateFilter(String birthDateFilter) {
+        this.birthDateFilter = birthDateFilter;
     }
 
     public SortFieldEnum getFieldSort() {

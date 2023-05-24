@@ -22,4 +22,5 @@
     <string name="registrationTittle">Rejestracja</string>
     <string name="registerSwitchToLogin">Zaloguj</string>
     <string name="loginRegisterConfirmPassword">Potwierdź hasło</string>
+    <string name="passwords_do_not_match">Podane hasła nie są ze sobą zgodne!</string>
 </resources>

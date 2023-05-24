@@ -65,18 +65,7 @@ public class LoginRegisterActivity extends LanguageActivity implements IActivity
         });
 
         switchModeButton.setOnClickListener(view -> {
-            if (mode == LoginRegisterModeEnum.LOGIN) {
-                mode = LoginRegisterModeEnum.REGISTER;
-                titleLoginRegisterTextView.setText(R.string.registrationTittle);
-                switchModeButton.setText(R.string.registerSwitchToLogin);
-                confirmPasswordEditText.setVisibility(View.VISIBLE);
-
-            } else {
-                mode = LoginRegisterModeEnum.LOGIN;
-                titleLoginRegisterTextView.setText(R.string.loginTittle);
-                switchModeButton.setText(R.string.loginSwitchToRegister);
-                confirmPasswordEditText.setVisibility(View.GONE);
-            }
+            switchModeLogic();
         });
     }
 
@@ -99,16 +88,43 @@ public class LoginRegisterActivity extends LanguageActivity implements IActivity
     private void registerFunction(String email, String password) {
         String confirmedPassword = confirmPasswordEditText.getText().toString();
 
-        if(password == confirmedPassword) {
+        if(password.equals(confirmedPassword)) {
             LoginRegisterService.registerUser(email, password, task -> {
                 if (task.isSuccessful()) {
                     Toast.makeText(LoginRegisterActivity.this, "Zarejestrowano pomyślnie", Toast.LENGTH_SHORT).show();
+                    // Switch to LOGIN mode after successful registration
+                    mode = LoginRegisterModeEnum.LOGIN;
+                    titleLoginRegisterTextView.setText(R.string.loginTittle);
+                    switchModeButton.setText(R.string.loginSwitchToRegister);
+                    confirmPasswordEditText.setVisibility(View.GONE);
                 } else {
                     Toast.makeText(LoginRegisterActivity.this, "Rejestracja nieudana: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
         } else {
-            Toast.makeText(LoginRegisterActivity.this, "Podane hasła nie są ze sobą zgodne!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginRegisterActivity.this, R.string.passwords_do_not_match, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void switchModeLogic() {
+        if (mode == LoginRegisterModeEnum.LOGIN) {
+            mode = LoginRegisterModeEnum.REGISTER;
+            titleLoginRegisterTextView.setText(R.string.registrationTittle);
+            switchModeButton.setText(R.string.registerSwitchToLogin);
+            confirmPasswordEditText.setVisibility(View.VISIBLE);
+            // Clear fields when switching to REGISTER mode
+            usernameEditText.setText("");
+            passwordEditText.setText("");
+            confirmPasswordEditText.setText("");
+        } else {
+            mode = LoginRegisterModeEnum.LOGIN;
+            titleLoginRegisterTextView.setText(R.string.loginTittle);
+            switchModeButton.setText(R.string.loginSwitchToRegister);
+            confirmPasswordEditText.setVisibility(View.GONE);
+            // Clear fields when switching to LOGIN mode
+            usernameEditText.setText("");
+            passwordEditText.setText("");
+            confirmPasswordEditText.setText("");
         }
     }
 }
