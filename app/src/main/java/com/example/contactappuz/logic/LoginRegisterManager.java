@@ -4,7 +4,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class LoginRegisterService {
+public class LoginRegisterManager {
     private static FirebaseAuth auth = FirebaseAuth.getInstance();
 
     public static void loginUser(String email, String password, OnCompleteListener<AuthResult> onCompleteListener) {

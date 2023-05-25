@@ -1,6 +1,7 @@
 package com.example.contactappuz.activities.major;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,9 +12,11 @@ import android.widget.Toast;
 import com.example.contactappuz.R;
 import com.example.contactappuz.activities.IActivity;
 import com.example.contactappuz.activities.LanguageActivity;
-import com.example.contactappuz.logic.LoginRegisterService;
+import com.example.contactappuz.logic.AdManager;
+import com.example.contactappuz.logic.LoginRegisterManager;
 import com.example.contactappuz.util.enums.mode.ActivityModeEnum;
 import com.example.contactappuz.util.enums.mode.LoginRegisterModeEnum;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginRegisterActivity extends LanguageActivity implements IActivity {
@@ -26,21 +29,35 @@ public class LoginRegisterActivity extends LanguageActivity implements IActivity
     private TextView titleLoginRegisterTextView;
 
     private LoginRegisterModeEnum mode;
+    private AdManager adManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        initializeComponents();
-
-        attachListeners();
+        // Check if user is logged in
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        String email = sharedPreferences.getString("logged_in_user_email", null);
+        if (email != null) {
+            // User is logged in, start main activity
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                login(user);
+            }
+        } else {
+            // User is not logged in, initialize login/register components
+            initializeComponents();
+            attachListeners();
+        }
     }
+
 
     @Override
     public void initializeComponents() {
         setContentView(R.layout.activity_login_register);
 
         mode = LoginRegisterModeEnum.LOGIN;
+        adManager = new AdManager(this);
 
         titleLoginRegisterTextView = findViewById(R.id.titleLoginRegisterTextView);
         loginRegisterButton = findViewById(R.id.loginRegisterButton);
@@ -57,7 +74,7 @@ public class LoginRegisterActivity extends LanguageActivity implements IActivity
             String password = passwordEditText.getText().toString();
 
             if (mode == LoginRegisterModeEnum.LOGIN) {
-                loginFunction(email, password);
+                loginWithAdsFunction(email, password);
 
             } else if (mode == LoginRegisterModeEnum.REGISTER) {
                 registerFunction(email, password);
@@ -69,27 +86,41 @@ public class LoginRegisterActivity extends LanguageActivity implements IActivity
         });
     }
 
-    private void loginFunction(String email, String password) {
-        LoginRegisterService.loginUser(email, password, task -> {
+    private void loginWithAdsFunction(String email, String password) {
+        LoginRegisterManager.loginUser(email, password, task -> {
             if (task.isSuccessful()) {
                 FirebaseUser user = task.getResult().getUser();
-                Intent intent = new Intent(LoginRegisterActivity.this, MainActivity.class);
-                intent.putExtra("mode", ActivityModeEnum.VIEW);
-                intent.putExtra("userId", user.getUid());
-                startActivity(intent);
-                finish();
+
+                // Save user email to SharedPreferences
+                SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("logged_in_user_email", email);
+                editor.apply();
+
+                // Load and show the advert
+                adManager.loadAndShowAdvert(this, () -> login(user));
             } else {
-                // Błąd logowania
-                Toast.makeText(LoginRegisterActivity.this, "Logowanie nieudane: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                // Login failed
+                Toast.makeText(LoginRegisterActivity.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void login(FirebaseUser user) {
+        // Navigate to main activity when ad is closed
+        Intent intent = new Intent(LoginRegisterActivity.this, MainActivity.class);
+        intent.putExtra("mode", ActivityModeEnum.VIEW);
+        intent.putExtra("userId", user.getUid());
+
+        startActivity(intent);
+        finish();
     }
 
     private void registerFunction(String email, String password) {
         String confirmedPassword = confirmPasswordEditText.getText().toString();
 
         if(password.equals(confirmedPassword)) {
-            LoginRegisterService.registerUser(email, password, task -> {
+            LoginRegisterManager.registerUser(email, password, task -> {
                 if (task.isSuccessful()) {
                     Toast.makeText(LoginRegisterActivity.this, "Zarejestrowano pomyślnie", Toast.LENGTH_SHORT).show();
                     // Switch to LOGIN mode after successful registration

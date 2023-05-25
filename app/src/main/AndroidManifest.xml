@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:usesCleartextTraffic="true"
 
@@ -59,7 +60,9 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+
+        <service
+            android:name=".logic.services.BirthdayNotificationService"
+            android:exported="false" />
     </application>
-
-
 </manifest>

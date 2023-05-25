@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class FireBaseService {
+public class FireBaseManager {
     private static FirebaseDatabase database;
 
-    private FireBaseService() {
+    private FireBaseManager() {
     }
 
     private static DatabaseReference getReferenceForUser(String userId) {
@@ -58,6 +58,26 @@ public class FireBaseService {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Toast.makeText(activity, "No access to the database.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static void getContactsForUser(String userId, Consumer<List<Contact>> onContactsFetched) {
+        getReferenceForUser(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Contact> contactList = new ArrayList<>();
+
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    Contact contact = child.getValue(Contact.class);
+                    contactList.add(contact);
+                }
+
+                onContactsFetched.accept(contactList);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
             }
         });
     }

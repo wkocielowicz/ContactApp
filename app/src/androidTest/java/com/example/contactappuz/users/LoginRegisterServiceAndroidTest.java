@@ -9,7 +9,7 @@ import android.util.Log;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.example.contactappuz.logic.LoginRegisterService;
+import com.example.contactappuz.logic.LoginRegisterManager;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
@@ -33,7 +33,7 @@ public class LoginRegisterServiceAndroidTest {
         FirebaseAuth.getInstance(app).useEmulator("10.0.2.2", 9099);
 
         auth = FirebaseAuth.getInstance();
-        LoginRegisterService.setAuth(auth);
+        LoginRegisterManager.setAuth(auth);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class LoginRegisterServiceAndroidTest {
         String password = "test123";
         CountDownLatch latch = new CountDownLatch(1);
 
-        LoginRegisterService.registerUser(email, password, task -> {
+        LoginRegisterManager.registerUser(email, password, task -> {
             if (task.isSuccessful()) {
                 assertTrue(task.isSuccessful());
                 auth.getCurrentUser().delete();
@@ -79,7 +79,7 @@ public class LoginRegisterServiceAndroidTest {
         if (auth.getCurrentUser() != null) {
             CountDownLatch loginLatch = new CountDownLatch(1);
 
-            LoginRegisterService.loginUser(email, password, task -> {
+            LoginRegisterManager.loginUser(email, password, task -> {
                 assertTrue(task.isSuccessful());
                 auth.getCurrentUser().delete();
                 loginLatch.countDown();

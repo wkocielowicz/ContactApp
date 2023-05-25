@@ -18,7 +18,7 @@ import com.example.contactappuz.activities.minor.AddEditContactActivity;
 import com.example.contactappuz.activities.util.ActivityUtil;
 import com.example.contactappuz.activities.util.FilterDialog;
 import com.example.contactappuz.database.model.Contact;
-import com.example.contactappuz.logic.FireBaseService;
+import com.example.contactappuz.logic.FireBaseManager;
 import com.example.contactappuz.util.ContactFilter;
 import com.example.contactappuz.util.ContactRowAdapter;
 import com.example.contactappuz.util.enums.ContactCategoryEnum;
@@ -78,7 +78,7 @@ public class ContactActivity extends LanguageActivity implements IActivity {
 
             @Override
             public void onDeleteButtonClick(Contact contact) {
-                FireBaseService.deleteContact(ActivityUtil.getUserId(), contact.getContactId(), task -> {
+                FireBaseManager.deleteContact(ActivityUtil.getUserId(), contact.getContactId(), task -> {
                     if (task.isSuccessful()) {
                         getContactsFromFirebase(categorySpinner.getSelectedItem().toString());
                     }
@@ -131,7 +131,7 @@ public class ContactActivity extends LanguageActivity implements IActivity {
     }
 
     private void getContactsFromFirebase(String selectedCategory) {
-        FireBaseService.getContactsFromFirebase(this, ActivityUtil.getUserId(), selectedCategory, contactFilter, newContacts -> {
+        FireBaseManager.getContactsFromFirebase(this, ActivityUtil.getUserId(), selectedCategory, contactFilter, newContacts -> {
             adapter.updateContacts(newContacts);
         });
     }

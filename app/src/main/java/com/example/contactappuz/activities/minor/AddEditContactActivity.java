@@ -1,5 +1,7 @@
 package com.example.contactappuz.activities.minor;
 
+import android.app.DatePickerDialog;
+import android.widget.DatePicker;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -12,9 +14,11 @@ import com.example.contactappuz.activities.IActivity;
 import com.example.contactappuz.activities.LanguageActivity;
 import com.example.contactappuz.activities.util.ActivityUtil;
 import com.example.contactappuz.database.model.Contact;
-import com.example.contactappuz.logic.FireBaseService;
+import com.example.contactappuz.logic.FireBaseManager;
 import com.example.contactappuz.util.enums.ContactCategoryEnum;
 import com.example.contactappuz.util.enums.mode.ActivityModeEnum;
+
+import java.util.Calendar;
 
 public class AddEditContactActivity extends LanguageActivity implements IActivity {
 
@@ -35,7 +39,6 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
 
         mode = getIntentMode();
         initializeComponents();
-
         attachListeners();
     }
 
@@ -69,7 +72,7 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
             Contact contact = loadFields();
 
             if (mode == ActivityModeEnum.ADD) {
-                FireBaseService.addContact(AddEditContactActivity.this, ActivityUtil.getUserId(), contact, task -> {
+                FireBaseManager.addContact(AddEditContactActivity.this, ActivityUtil.getUserId(), contact, task -> {
                     if (task.isSuccessful()) {
                         finish();
                     }
@@ -77,7 +80,7 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
             } else if (mode == ActivityModeEnum.EDIT) {
                 String contactId = getIntent().getStringExtra("contactId");
                 if (contactId != null) {
-                    FireBaseService.updateContact(AddEditContactActivity.this, ActivityUtil.getUserId(), contactId, contact, task -> {
+                    FireBaseManager.updateContact(AddEditContactActivity.this, ActivityUtil.getUserId(), contactId, contact, task -> {
                         if (task.isSuccessful()) {
                             finish();
                         }
@@ -100,6 +103,10 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
             addressEditText.setText("");
             birthDateEditText.setText("");
             categorySpinner.setSelection(0); // Set the spinner back to the default selection
+        });
+
+        birthDateEditText.setOnClickListener(view -> {
+            showDatePickerDialog();
         });
     }
 
@@ -125,5 +132,20 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
         contact.setCategory(categorySpinner.getSelectedItem().toString());
 
         return contact;
+    }
+
+    private void showDatePickerDialog() {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                // Increment month by 1 because January is 0
+                month = month + 1;
+                String date = dayOfMonth + "/" + month + "/" + year;
+                birthDateEditText.setText(date);
+            }
+        }, Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+
+        // Show the dialog
+        datePickerDialog.show();
     }
 }
