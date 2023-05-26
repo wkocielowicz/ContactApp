@@ -1,9 +1,18 @@
 package com.example.contactappuz.util;
 
+        import static android.app.Activity.RESULT_OK;
+
         import android.Manifest;
         import android.app.Activity;
         import android.content.Context;
+        import android.content.IntentSender;
         import android.content.pm.PackageManager;
+
+        import com.google.android.gms.common.api.ApiException;
+        import com.google.android.gms.common.api.ResolvableApiException;
+        import com.google.android.gms.location.*;
+        import com.google.android.gms.tasks.OnCompleteListener;
+        import com.google.android.gms.tasks.Task;
 
         import androidx.core.app.ActivityCompat;
 
@@ -34,14 +43,16 @@ public class PermissionChecker {
             Manifest.permission.BLUETOOTH_PRIVILEGED
     };
 
+    private static final int REQUEST_ENABLE_LOCATION = 123;
+
     public PermissionChecker(Context context) {
         this.context = context;
     }
 
     public void checkPermissions() {
-        int permission1 = ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int permission2 = ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN);
-        if (permission1 != PackageManager.PERMISSION_GRANTED) {
+        int writePermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int bluetoothPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN);
+        if (writePermission != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
             ActivityCompat.requestPermissions(
                     (Activity) context,
@@ -49,12 +60,58 @@ public class PermissionChecker {
                     1
             );
         }
-        if (permission2 != PackageManager.PERMISSION_GRANTED) {
+        if (bluetoothPermission != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                     (Activity) context,
                     PERMISSIONS_LOCATION,
                     1
             );
+            requestLocationEnable();
+        }else{
+            requestLocationEnable();
         }
     }
+    private void requestLocationEnable() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+
+        SettingsClient settingsClient = LocationServices.getSettingsClient(context);
+        Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
+
+        task.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
+            @Override
+            public void onComplete(Task<LocationSettingsResponse> task) {
+                try {
+                    LocationSettingsResponse response = task.getResult(ApiException.class);
+                    // Lokalizacja jest już włączona
+                } catch (ApiException exception) {
+                    if (exception.getStatusCode() == LocationSettingsStatusCodes.RESOLUTION_REQUIRED) {
+                        try {
+                            // Poproś użytkownika o włączenie lokalizacji
+                            ResolvableApiException resolvable = (ResolvableApiException) exception;
+                            resolvable.startResolutionForResult((Activity)context, REQUEST_ENABLE_LOCATION);
+                        } catch (IntentSender.SendIntentException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+// W przypadku włączenia lokalizacji przez użytkownika, obsłuż wynik w onActivityResult():
+
+    public void onActivityResult(int requestCode, int resultCode){
+        if (requestCode == REQUEST_ENABLE_LOCATION) {
+            if (resultCode == RESULT_OK) {
+                // Lokalizacja została włączona przez użytkownika
+            } else {
+                // Użytkownik odrzucił włączenie lokalizacji
+            }
+        }
+    }
+
 }

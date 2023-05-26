@@ -1,14 +1,16 @@
 package com.example.contactappuz;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 
-import com.example.contactappuz.util.Bluetooth;
+import com.example.contactappuz.util.BluetoothService;
+import com.example.contactappuz.util.PermissionChecker;
 
 public class BluetoothActivity extends AppCompatActivity {
     private static final String TAG = "BluetoothActivity";
@@ -16,11 +18,16 @@ public class BluetoothActivity extends AppCompatActivity {
 
     Button  /*mbtnForward, mbtnBack, mbtnRight, mbtnLeft, mbtnStop,*/ mbtnDiscover, mbtnConnect, mbtnCollect, mbttSendDB;
 
-    Bluetooth bluetoothService;
+    BluetoothService bluetoothService;
     byte[] buffer = new byte[1024];
     int bytes;
     String Data="";
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        bluetoothService.onActivityResult(requestCode, resultCode);
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -28,7 +35,7 @@ public class BluetoothActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
 
-        bluetoothService = new Bluetooth(this);
+        bluetoothService = new BluetoothService(this);
 
         /*ApiClient klient = new ApiClient();
         mbtnForward = findViewById(R.id.btnforward);
@@ -98,5 +105,4 @@ public class BluetoothActivity extends AppCompatActivity {
     //        }
     //    });
     }
-
 }

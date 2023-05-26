@@ -6,27 +6,17 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanResult;
-import android.bluetooth.le.ScanSettings;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import androidx.core.content.ContextCompat;
 
 import com.example.contactappuz.R;
 
@@ -34,11 +24,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 
-public class Bluetooth {
+public class BluetoothService {
     private static final String TAG = "BluetoothService";
     private static final int REQUEST_ENABLE_BT = 1;
 
@@ -296,7 +285,7 @@ public class Bluetooth {
 
 
     @SuppressLint("MissingPermission")
-    public Bluetooth(Context context) {
+    public BluetoothService(Context context) {
         Activity activity = (Activity) context;
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -313,6 +302,7 @@ public class Bluetooth {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);     //TODO do rozwiązania
         }
+
         //selectedDevice = bluetoothAdapter.getRemoteDevice("");//TODO do poprawy - szukaj i sparuj urządzenia
 
 
@@ -415,5 +405,8 @@ public class Bluetooth {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    public void onActivityResult(int requestCode, int resultCode){
+        permissionChecker.onActivityResult(requestCode, resultCode);
     }
 }
