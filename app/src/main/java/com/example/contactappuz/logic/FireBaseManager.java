@@ -27,16 +27,34 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+/**
+ * Manager class for handling Firebase database operations related to contacts.
+ */
 public class FireBaseManager {
     private static FirebaseDatabase database;
 
     private FireBaseManager() {
     }
 
+    /**
+     * Retrieves the database reference for a specific user.
+     *
+     * @param userId The user ID.
+     * @return The DatabaseReference for the user's contacts.
+     */
     private static DatabaseReference getReferenceForUser(String userId) {
         return FirebaseDatabase.getInstance().getReference("users/" + userId + "/contacts");
     }
 
+    /**
+     * Retrieves contacts from Firebase database based on specified criteria.
+     *
+     * @param activity         The activity.
+     * @param userId           The user ID.
+     * @param selectedCategory The selected category to filter contacts (or null for all categories).
+     * @param contactFilter    The ContactFilter object containing filter criteria.
+     * @param onContactsFetched A consumer to handle the fetched contacts.
+     */
     public static void getContactsFromFirebase(Activity activity, String userId, String selectedCategory, ContactFilter contactFilter, Consumer<List<Contact>> onContactsFetched) {
         getReferenceForUser(userId).addValueEventListener(new ValueEventListener() {
             @Override
@@ -68,6 +86,12 @@ public class FireBaseManager {
         });
     }
 
+    /**
+     * Retrieves all contacts for a user from Firebase database.
+     *
+     * @param userId           The user ID.
+     * @param onContactsFetched A consumer to handle the fetched contacts.
+     */
     public static void getContactsForUser(String userId, Consumer<List<Contact>> onContactsFetched) {
         getReferenceForUser(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -88,6 +112,15 @@ public class FireBaseManager {
         });
     }
 
+    /**
+     * Adds a contact to the Firebase database.
+     *
+     * @param activity          The activity.
+     * @param userId            The user ID.
+     * @param contact           The contact to add.
+     * @param imageUri          The URI of the contact's image.
+     * @param onTaskCompleted   A consumer to handle the task completion.
+     */
     public static void addContact(Activity activity, String userId, Contact contact, Uri imageUri, Consumer<Task<Void>> onTaskCompleted) {
         DatabaseReference newContactRef = getReferenceForUser(userId).push();
         contact.setContactId(newContactRef.getKey()); // assumes your Contact class has a setter for contactId
@@ -107,6 +140,16 @@ public class FireBaseManager {
         });
     }
 
+    /**
+     * Updates a contact in the Firebase database.
+     *
+     * @param activity          The activity.
+     * @param userId            The user ID.
+     * @param contactId         The ID of the contact to update.
+     * @param contact           The updated contact object.
+     * @param imageUri          The URI of the updated contact's image.
+     * @param onTaskCompleted   A consumer to handle the task completion.
+     */
     public static void updateContact(Activity activity, String userId, String contactId, Contact contact, Uri imageUri, Consumer<Task<Void>> onTaskCompleted) {
         uploadContactImageToFirebaseStorage(contact, imageUri, new OnFailureListener() {
             @Override
@@ -135,6 +178,13 @@ public class FireBaseManager {
         });
     }
 
+    /**
+     * Deletes a contact from the Firebase database.
+     *
+     * @param userId              The user ID.
+     * @param contactId           The ID of the contact to delete.
+     * @param onCompleteListener A listener to handle the completion of the delete operation.
+     */
     public static void deleteContact(String userId, String contactId, OnCompleteListener<Void> onCompleteListener) {
         DatabaseReference contactsRef = FirebaseDatabase.getInstance().getReference("contacts");
 
@@ -155,9 +205,16 @@ public class FireBaseManager {
         });
     }
 
+    /**
+     * Downloads the photo of a contact from Firebase storage.
+     *
+     * @param activity           The activity.
+     * @param contact            The contact.
+     * @param onPhotoDownloaded  A consumer to handle the downloaded photo bitmap.
+     */
     public static void downloadPhoto(Activity activity, Contact contact, Consumer<Bitmap> onPhotoDownloaded) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        // Przykład ścieżki do pliku: "lCoA9aslI1R1s1WaRBkDvu2EWSH2/3599ecb6-a2d7-4ad7-bea9-2cf80bb2a28c/cb57d594-88af-4ea4-b125-c1578e3ea399"
+        // Example file path: "lCoA9aslI1R1s1WaRBkDvu2EWSH2/3599ecb6-a2d7-4ad7-bea9-2cf80bb2a28c/cb57d594-88af-4ea4-b125-c1578e3ea399"
         StorageReference photoRef = storage.getReference().child(contact.getPhotoUrl());
 
         photoRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(bytes -> {
@@ -169,7 +226,13 @@ public class FireBaseManager {
         });
     }
 
-
+    /**
+     * Uploads the contact's image to Firebase storage.
+     *
+     * @param contact             The contact.
+     * @param imageUri            The URI of the contact's image.
+     * @param onFailureListener   A listener to handle the upload failure.
+     */
     private static void uploadContactImageToFirebaseStorage(Contact contact, Uri imageUri, OnFailureListener onFailureListener) {
         if (imageUri != null) {
             StorageReference fileReference = FirebaseStorage.getInstance().getReference(contact.getPhotoUrl());

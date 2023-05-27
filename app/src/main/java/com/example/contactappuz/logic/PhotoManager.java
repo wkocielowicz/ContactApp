@@ -13,8 +13,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+/**
+ * The PhotoManager class handles loading and saving contact photos.
+ */
 public class PhotoManager {
 
+    /**
+     * Loads a contact's photo from the device storage or downloads it from Firebase if not available locally.
+     *
+     * @param context        The context of the calling activity or fragment.
+     * @param contact        The contact for which to load the photo.
+     * @param onImageLoaded  A consumer to handle the loaded photo bitmap.
+     */
     public static void loadImageFromDevice(Context context, Contact contact, Consumer<Bitmap> onImageLoaded) {
         File filePath = new File(context.getFilesDir(), contact.getPhotoPath() + ".jpeg");
         Log.d("PhotoManager", "Loading image from path: " + filePath.getAbsolutePath());  // Log image path
@@ -33,8 +43,14 @@ public class PhotoManager {
         }
     }
 
-
-
+    /**
+     * Saves a contact's photo to the device storage.
+     *
+     * @param context       The context of the calling activity or fragment.
+     * @param imageBitmap   The bitmap of the photo to save.
+     * @param photoPath     The path at which to save the photo.
+     * @return              True if the photo was saved successfully, false otherwise.
+     */
     public static boolean saveImageToDevice(Context context, Bitmap imageBitmap, String photoPath) {
         File imageFile = new File(context.getFilesDir(), photoPath + ".jpeg");  // Add extension here
         File storageDir = imageFile.getParentFile();

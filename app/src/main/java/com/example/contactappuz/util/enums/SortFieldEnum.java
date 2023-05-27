@@ -10,29 +10,47 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+/**
+ * Enum representing sorting fields for contacts.
+ */
 public enum SortFieldEnum {
     FIRST_NAME("First name"),
-
     SECOND_NAME("Second name"),
-
     ADDRESS("Address"),
-
     BIRTH_DATE("Birth date");
 
     private String name;
 
+    /**
+     * Constructs a SortFieldEnum with the specified name.
+     *
+     * @param name The name of the sorting field.
+     */
     private SortFieldEnum(String name) {
         this.name = name;
     }
 
+    /**
+     * Returns the name of the sorting field.
+     *
+     * @return The name of the sorting field.
+     */
     public String getName() {
         return name;
     }
 
-
-
+    /**
+     * Custom ArrayAdapter for SortFieldEnum to be used with spinners.
+     */
     public static class SortFieldEnumAdapter extends ArrayAdapter<SortFieldEnum> {
 
+        /**
+         * Constructs a SortFieldEnumAdapter with the specified context, resource ID, and SortFieldEnum array.
+         *
+         * @param context  The current context.
+         * @param resource The resource ID for a layout file containing a TextView to use when instantiating views.
+         * @param objects  The objects to represent in the Spinner.
+         */
         public SortFieldEnumAdapter(@NonNull Context context, int resource, @NonNull SortFieldEnum[] objects) {
             super(context, resource, objects);
         }

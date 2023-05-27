@@ -14,11 +14,23 @@ import com.example.contactappuz.R;
 import com.example.contactappuz.util.ContactFilter;
 import com.example.contactappuz.util.enums.SortFieldEnum;
 
+/**
+ * The FilterDialog class provides a dialog for filtering contacts based on various criteria.
+ * It allows users to set filters for first name, last name, address, birth date, sorting field,
+ * and sorting order (ascending or descending).
+ */
 public class FilterDialog {
     public interface OnFilterAppliedListener {
         void onFilterApplied(ContactFilter contactFilter);
     }
 
+    /**
+     * Shows the filter dialog.
+     *
+     * @param context       The context in which the dialog is shown.
+     * @param contactFilter The current contact filter to be modified.
+     * @param listener      The listener to be notified when the filter is applied.
+     */
     public static void show(Context context, ContactFilter contactFilter, OnFilterAppliedListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -66,6 +78,13 @@ public class FilterDialog {
         alertDialog.show();
     }
 
+    /**
+     * Sets up the sorting field spinner.
+     *
+     * @param context          The context of the activity.
+     * @param sortFieldSpinner The spinner for selecting the sorting field.
+     * @param contactFilter    The current contact filter.
+     */
     private static void setupSortFieldSpinner(Context context, Spinner sortFieldSpinner, ContactFilter contactFilter) {
         SortFieldEnum.SortFieldEnumAdapter sortAdapter = new SortFieldEnum.SortFieldEnumAdapter(context, android.R.layout.simple_spinner_item, SortFieldEnum.values());
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

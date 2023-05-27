@@ -11,6 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Locale;
 
+/**
+ * The LanguageActivity serves as a base activity for language-related functionality.
+ * It provides methods to change the language of the application.
+ */
 public class LanguageActivity extends AppCompatActivity {
 
     protected static final String SHARED_PREFS = "language_prefs";
@@ -29,6 +33,11 @@ public class LanguageActivity extends AppCompatActivity {
         super.attachBaseContext(context);
     }
 
+    /**
+     * Changes the language of the application.
+     *
+     * @param languageCode The language code of the desired language.
+     */
     protected void changeLanguage(String languageCode) {
         Locale locale = new Locale(languageCode);
         Locale.setDefault(locale);
