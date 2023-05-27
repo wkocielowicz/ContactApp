@@ -1,6 +1,7 @@
 package com.example.contactappuz.activities.minor;
 
 import android.app.DatePickerDialog;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,7 +15,10 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.content.FileProvider;
 
 import com.example.contactappuz.R;
 import com.example.contactappuz.activities.IActivity;
@@ -28,8 +32,11 @@ import com.example.contactappuz.util.enums.mode.ActivityModeEnum;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -105,12 +112,14 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
     @Override
     public void attachListeners() {
         acceptButton.setOnClickListener(view -> {
-            Contact contact = loadFields();
+            if (validateFields()) {
+                Contact contact = loadFields();
 
-            if (mode == ActivityModeEnum.ADD) {
-                saveContact(contact);
-            } else if (mode == ActivityModeEnum.EDIT) {
-                updateContact(contact);
+                if (mode == ActivityModeEnum.ADD) {
+                    saveContact(contact);
+                } else if (mode == ActivityModeEnum.EDIT) {
+                    updateContact(contact);
+                }
             }
         });
 
@@ -181,6 +190,37 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
     }
 
     /**
+     * Validates if all fields are filled.
+     *
+     * @return true if all fields are filled, false otherwise.
+     */
+    private boolean validateFields() {
+        if (firstNameEditText.getText().toString().trim().isEmpty()) {
+            firstNameEditText.setError("Pole wymagane");
+            return false;
+        } else if (lastNameEditText.getText().toString().trim().isEmpty()) {
+            lastNameEditText.setError("Pole wymagane");
+            return false;
+        } else if (addressEditText.getText().toString().trim().isEmpty()) {
+            addressEditText.setError("Pole wymagane");
+            return false;
+        } else if (birthDateEditText.getText().toString().trim().isEmpty()) {
+            birthDateEditText.setError("Pole wymagane");
+            return false;
+        } else if (categorySpinner.getSelectedItem().toString().trim().isEmpty()) {
+            ((TextView) categorySpinner.getSelectedView()).setError("");
+            Toast.makeText(this, "Wybierz kategorię", Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (selectedImageUri == null) {
+            Toast.makeText(this, "Dodaj zdjęcie", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
      * Shows a DatePickerDialog to select the birth date.
      */
     private void showDatePickerDialog() {
@@ -208,7 +248,10 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
         Bitmap image = null;
         try {
             InputStream inputStream = getContentResolver().openInputStream(selectedFileUri);
-            image = BitmapFactory.decodeStream(inputStream);
+            Bitmap originalImage = BitmapFactory.decodeStream(inputStream);
+            if (originalImage != null) {
+                image = scaleBitmap(originalImage, 400, 400);
+            }
             if (inputStream != null) {
                 inputStream.close();
             }
@@ -225,16 +268,20 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
      * @param contact The Contact object to be saved.
      */
     private void saveContact(Contact contact) {
-        if (!PhotoManager.saveImageToDevice(AddEditContactActivity.this, uriToBitmap(selectedImageUri), contact.getPhotoPath())) {
+        Bitmap scaledBitmap = uriToBitmap(selectedImageUri);
+        Uri scaledImageUri = bitmapToUriConverter(scaledBitmap);
+
+        if (!PhotoManager.saveImageToDevice(AddEditContactActivity.this, scaledBitmap, contact.getPhotoPath())) {
             Toast.makeText(AddEditContactActivity.this, "Failed to save photo on device.", Toast.LENGTH_SHORT).show();
         }
 
-        FireBaseManager.addContact(AddEditContactActivity.this, ActivityUtil.getUserId(), contact, selectedImageUri, task -> {
+        FireBaseManager.addContact(AddEditContactActivity.this, ActivityUtil.getUserId(), contact, scaledImageUri, task -> {
             if (task.isSuccessful()) {
                 finish();
             }
         });
     }
+
 
     /**
      * Updates a contact in the Firebase database.
@@ -242,13 +289,16 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
      * @param contact The Contact object to be updated.
      */
     private void updateContact(Contact contact) {
-        if (!PhotoManager.saveImageToDevice(AddEditContactActivity.this, uriToBitmap(selectedImageUri), contact.getPhotoPath())) {
+        Bitmap scaledBitmap = uriToBitmap(selectedImageUri);
+        Uri scaledImageUri = bitmapToUriConverter(scaledBitmap);
+
+        if (!PhotoManager.saveImageToDevice(AddEditContactActivity.this, scaledBitmap, contact.getPhotoPath())) {
             Toast.makeText(AddEditContactActivity.this, "Failed to save photo on device.", Toast.LENGTH_SHORT).show();
         }
 
         String contactId = getIntent().getStringExtra("contactId");
         if (contactId != null) {
-            FireBaseManager.updateContact(AddEditContactActivity.this, ActivityUtil.getUserId(), contactId, contact, selectedImageUri, task -> {
+            FireBaseManager.updateContact(AddEditContactActivity.this, ActivityUtil.getUserId(), contactId, contact, scaledImageUri, task -> {
                 if (task.isSuccessful()) {
                     finish();
                 }
@@ -257,4 +307,47 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
             Toast.makeText(AddEditContactActivity.this, "Failed to update contact", Toast.LENGTH_SHORT).show();
         }
     }
+
+    /**
+     * Scales a Bitmap to a given width and height.
+     *
+     * @param bitmap The Bitmap to scale.
+     * @param newWidth The new width of the Bitmap.
+     * @param newHeight The new height of the Bitmap.
+     * @return The scaled Bitmap.
+     */
+    private Bitmap scaleBitmap(Bitmap bitmap, int newWidth, int newHeight) {
+        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+    }
+
+    /**
+     * This method is used to convert the bitmap to uri.
+     * @param mBitmap This is the bitmap which is to be converted to uri.
+     * @return Uri This returns the Uri of the saved image.
+     */
+    private Uri bitmapToUriConverter(Bitmap mBitmap) {
+        // Get the context wrapper
+        ContextWrapper wrapper = new ContextWrapper(getApplicationContext());
+
+        // Initialize a new file in specific directory
+        File file = wrapper.getExternalFilesDir("Images");
+        file = new File(file, "UniqueFileName"+".jpg");
+
+        try {
+            // Compress the bitmap and save in the file
+            OutputStream stream = null;
+            stream = new FileOutputStream(file);
+            mBitmap.compress(Bitmap.CompressFormat.JPEG,100,stream);
+            stream.flush();
+            stream.close();
+
+        } catch (IOException e) // Catch the exception
+        {
+            e.printStackTrace();
+        }
+
+        // Return the saved bitmap uri
+        return FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", file);
+    }
+
 }

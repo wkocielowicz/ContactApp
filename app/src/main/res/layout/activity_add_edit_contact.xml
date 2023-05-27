@@ -36,6 +36,7 @@
 
     <EditText
         android:id="@+id/birthDateEditText"
+        android:focusable="false"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/addContactBirthDateHint"
