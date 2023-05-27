@@ -1,6 +1,9 @@
 package com.example.contactappuz.logic;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -9,12 +12,15 @@ import androidx.annotation.NonNull;
 import com.example.contactappuz.database.model.Contact;
 import com.example.contactappuz.util.ContactFilter;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,8 +88,18 @@ public class FireBaseManager {
         });
     }
 
-    public static void addContact(Activity activity, String userId, Contact contact, Consumer<Task<Void>> onTaskCompleted) {
-        getReferenceForUser(userId).push().setValue(contact).addOnCompleteListener(task -> {
+    public static void addContact(Activity activity, String userId, Contact contact, Uri imageUri, Consumer<Task<Void>> onTaskCompleted) {
+        DatabaseReference newContactRef = getReferenceForUser(userId).push();
+        contact.setContactId(newContactRef.getKey()); // assumes your Contact class has a setter for contactId
+
+        uploadContactImageToFirebaseStorage(contact, imageUri, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(activity, "Failed to upload contact image", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        newContactRef.setValue(contact).addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Toast.makeText(activity, "Failed to add contact", Toast.LENGTH_SHORT).show();
             }
@@ -91,7 +107,14 @@ public class FireBaseManager {
         });
     }
 
-    public static void updateContact(Activity activity, String userId, String contactId, Contact contact, Consumer<Task<Void>> onTaskCompleted) {
+    public static void updateContact(Activity activity, String userId, String contactId, Contact contact, Uri imageUri, Consumer<Task<Void>> onTaskCompleted) {
+        uploadContactImageToFirebaseStorage(contact, imageUri, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(activity, "Failed to upload contact image", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         getReferenceForUser(userId).orderByChild("contactId").equalTo(contactId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -130,6 +153,34 @@ public class FireBaseManager {
                 Log.e("FirebaseError", "Failed to find contact: " + databaseError.getMessage());
             }
         });
+    }
+
+    public static void downloadPhoto(Activity activity, Contact contact, Consumer<Bitmap> onPhotoDownloaded) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        // Przykład ścieżki do pliku: "lCoA9aslI1R1s1WaRBkDvu2EWSH2/3599ecb6-a2d7-4ad7-bea9-2cf80bb2a28c/cb57d594-88af-4ea4-b125-c1578e3ea399"
+        StorageReference photoRef = storage.getReference().child(contact.getPhotoUrl());
+
+        photoRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(bytes -> {
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            PhotoManager.saveImageToDevice(activity, bitmap, contact.getPhotoPath());
+            onPhotoDownloaded.accept(bitmap);
+        }).addOnFailureListener(e -> {
+            Toast.makeText(activity, "Failed to download photo", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+
+    private static void uploadContactImageToFirebaseStorage(Contact contact, Uri imageUri, OnFailureListener onFailureListener) {
+        if (imageUri != null) {
+            StorageReference fileReference = FirebaseStorage.getInstance().getReference(contact.getPhotoUrl());
+            fileReference.putFile(imageUri)
+                    .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            onFailureListener.onFailure(task.getException());
+                        }
+                    }))
+                    .addOnFailureListener(onFailureListener);
+        }
     }
 
 }

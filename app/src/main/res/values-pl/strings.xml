@@ -23,4 +23,6 @@
     <string name="registerSwitchToLogin">Zaloguj</string>
     <string name="loginRegisterConfirmPassword">Potwierdź hasło</string>
     <string name="passwords_do_not_match">Podane hasła nie są ze sobą zgodne!</string>
+    <string name="addContactContactImage">Zdjęcie</string>
+    <string name="addContactImagePlaceholder">Dodaj zdjęcie</string>
 </resources>
