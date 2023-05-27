@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -86,14 +87,21 @@ public class BirthdayNotificationManager {
      * @return True if the date is today, false otherwise.
      */
     private boolean CheckDate(String date) {
-        String[] parts = date.split("/");
-        int day = Integer.parseInt(parts[0]);
-        int month = Integer.parseInt(parts[1]) - 1;
+        try {
+            String[] parts = date.split("/");
+            int day = Integer.parseInt(parts[0]);
+            int month = Integer.parseInt(parts[1]) - 1;
 
-        Calendar today = Calendar.getInstance();
-        Calendar birthday = Calendar.getInstance();
-        birthday.set(today.get(Calendar.YEAR), month, day); // Set the year as the current year to compare DAY_OF_YEAR
-        return today.get(Calendar.DAY_OF_YEAR) == birthday.get(Calendar.DAY_OF_YEAR);
+            Calendar today = Calendar.getInstance();
+            Calendar birthday = Calendar.getInstance();
+            birthday.set(today.get(Calendar.YEAR), month, day); // Set the year as the current year to compare DAY_OF_YEAR
+            return today.get(Calendar.DAY_OF_YEAR) == birthday.get(Calendar.DAY_OF_YEAR);
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+            // Log the exception for debugging purposes
+            Log.e("CheckDate", "Failed to parse date: " + date, e);
+            // In case of an exception, do nothing and return false
+            return false;
+        }
     }
 
     /**
