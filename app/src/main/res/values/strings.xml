@@ -17,6 +17,8 @@
     <string name="addContactClearButton">Clear</string>
     <string name="addContactAcceptButton">Accept</string>
     <string name="addContactBackButton">Back</string>
+    <string name="addContactContactImage">Photo</string>
+    <string name="addContactImagePlaceholder">Add your photo</string>
 
     <!-- Contact -->
     <string name="contactFilter">Filter</string>

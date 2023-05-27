@@ -3,6 +3,7 @@ package com.example.contactappuz.activities.major;
 import static com.example.contactappuz.activities.util.ActivityUtil.getUserId;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 
@@ -68,8 +69,13 @@ public class MainActivity extends LanguageActivity implements IActivity {
     private void startServices() {
         Intent serviceIntent = new Intent(this, BirthdayNotificationService.class);
         serviceIntent.putExtra("userId", getUserId());
-        startService(serviceIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
     }
+
 
     private void goToContactActivity() {
         Intent intent = new Intent(MainActivity.this, ContactActivity.class);
