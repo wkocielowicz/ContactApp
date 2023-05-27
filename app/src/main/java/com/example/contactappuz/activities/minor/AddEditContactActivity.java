@@ -33,6 +33,9 @@ import java.io.InputStream;
 import java.util.Calendar;
 import java.util.UUID;
 
+/**
+ * The AddEditContactActivity class handles the addition and editing of contacts.
+ */
 public class AddEditContactActivity extends LanguageActivity implements IActivity {
 
     private Button acceptButton;
@@ -69,6 +72,11 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
         }
     }
 
+    /**
+     * Retrieves the mode (ADD or EDIT) from the intent.
+     *
+     * @return The activity mode.
+     */
     public ActivityModeEnum getIntentMode() {
         return (ActivityModeEnum) getIntent().getSerializableExtra("mode");
     }
@@ -89,7 +97,7 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
 
         ActivityUtil.initializeCategorySpinner(categorySpinner, ContactCategoryEnum.class, this);
 
-        if(mode == ActivityModeEnum.EDIT) {
+        if (mode == ActivityModeEnum.EDIT) {
             setFields();
         }
     }
@@ -130,6 +138,9 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
         });
     }
 
+    /**
+     * Sets the field values based on the contact received from the intent.
+     */
     private void setFields() {
         Contact contact = (Contact) getIntent().getSerializableExtra("contact");
         if (contact != null) {
@@ -147,6 +158,11 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
         }
     }
 
+    /**
+     * Loads the field values into a Contact object.
+     *
+     * @return The Contact object with field values.
+     */
     private Contact loadFields() {
         Contact contact = new Contact();
 
@@ -164,6 +180,9 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
         return contact;
     }
 
+    /**
+     * Shows a DatePickerDialog to select the birth date.
+     */
     private void showDatePickerDialog() {
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -179,6 +198,12 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
         datePickerDialog.show();
     }
 
+    /**
+     * Converts a Uri to a Bitmap.
+     *
+     * @param selectedFileUri The Uri of the selected image.
+     * @return The Bitmap object.
+     */
     private Bitmap uriToBitmap(Uri selectedFileUri) {
         Bitmap image = null;
         try {
@@ -194,8 +219,13 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
         return image;
     }
 
+    /**
+     * Saves a contact to the Firebase database.
+     *
+     * @param contact The Contact object to be saved.
+     */
     private void saveContact(Contact contact) {
-        if(!PhotoManager.saveImageToDevice(AddEditContactActivity.this, uriToBitmap(selectedImageUri), contact.getPhotoPath())) {
+        if (!PhotoManager.saveImageToDevice(AddEditContactActivity.this, uriToBitmap(selectedImageUri), contact.getPhotoPath())) {
             Toast.makeText(AddEditContactActivity.this, "Failed to save photo on device.", Toast.LENGTH_SHORT).show();
         }
 
@@ -206,8 +236,13 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
         });
     }
 
+    /**
+     * Updates a contact in the Firebase database.
+     *
+     * @param contact The Contact object to be updated.
+     */
     private void updateContact(Contact contact) {
-        if(!PhotoManager.saveImageToDevice(AddEditContactActivity.this, uriToBitmap(selectedImageUri), contact.getPhotoPath())) {
+        if (!PhotoManager.saveImageToDevice(AddEditContactActivity.this, uriToBitmap(selectedImageUri), contact.getPhotoPath())) {
             Toast.makeText(AddEditContactActivity.this, "Failed to save photo on device.", Toast.LENGTH_SHORT).show();
         }
 

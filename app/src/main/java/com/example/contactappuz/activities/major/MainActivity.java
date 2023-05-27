@@ -16,6 +16,9 @@ import com.example.contactappuz.util.enums.mode.ActivityModeEnum;
 
 import java.util.Locale;
 
+/**
+ * The main activity of the application.
+ */
 public class MainActivity extends LanguageActivity implements IActivity {
 
     private Button goToContactActivityButton;
@@ -36,10 +39,18 @@ public class MainActivity extends LanguageActivity implements IActivity {
         startServices();
     }
 
+    /**
+     * Retrieves the activity mode from the intent.
+     *
+     * @return The activity mode.
+     */
     public ActivityModeEnum getIntentMode() {
         return (ActivityModeEnum) getIntent().getSerializableExtra("mode");
     }
 
+    /**
+     * Initializes the UI components of the activity.
+     */
     @Override
     public void initializeComponents() {
         setContentView(R.layout.activity_main);
@@ -51,6 +62,9 @@ public class MainActivity extends LanguageActivity implements IActivity {
 
     }
 
+    /**
+     * Attaches listeners to the buttons.
+     */
     @Override
     public void attachListeners() {
         goToContactActivityButton.setOnClickListener(view -> {
@@ -66,6 +80,9 @@ public class MainActivity extends LanguageActivity implements IActivity {
         });
     }
 
+    /**
+     * Starts the required services for the activity.
+     */
     private void startServices() {
         Intent serviceIntent = new Intent(this, BirthdayNotificationService.class);
         serviceIntent.putExtra("userId", getUserId());
@@ -76,7 +93,9 @@ public class MainActivity extends LanguageActivity implements IActivity {
         }
     }
 
-
+    /**
+     * Navigates to the ContactActivity.
+     */
     private void goToContactActivity() {
         Intent intent = new Intent(MainActivity.this, ContactActivity.class);
         intent.putExtra("mode", ActivityModeEnum.VIEW);

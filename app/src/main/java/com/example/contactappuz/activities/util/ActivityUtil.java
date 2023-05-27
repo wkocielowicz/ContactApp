@@ -10,8 +10,21 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The ActivityUtil class provides utility methods for activities.
+ */
 public class ActivityUtil {
 
+    /**
+     * Initializes a spinner with category items from an enum class.
+     *
+     * @param spinner     The spinner to be initialized.
+     * @param enumClass   The enum class containing the category items.
+     * @param context     The context of the activity.
+     * @param additionalItems Additional items to be added to the spinner (optional).
+     *                        These items will be added before the enum items.
+     * @param <T>         The type of the enum.
+     */
     public static <T extends Enum<T>> void initializeCategorySpinner(Spinner spinner, Class<T> enumClass, Context context, String... additionalItems) {
         List<String> categoryItems = new ArrayList<>();
 
@@ -32,6 +45,11 @@ public class ActivityUtil {
         spinner.setAdapter(categorySpinnerAdapter);
     }
 
+    /**
+     * Returns the current user ID.
+     *
+     * @return The current user ID, or null if the user is not authenticated.
+     */
     public static String getUserId() {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();

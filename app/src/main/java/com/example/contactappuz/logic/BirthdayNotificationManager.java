@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * Manager class for handling birthday notifications for contacts.
+ */
 public class BirthdayNotificationManager {
 
     private List<Contact> contactList;
@@ -24,11 +27,20 @@ public class BirthdayNotificationManager {
     private String userId;
     private List<Contact> birthdayContactList = new ArrayList<>();
 
+    /**
+     * Constructs a BirthdayNotificationManager object.
+     *
+     * @param context The context.
+     * @param userId  The user ID.
+     */
     public BirthdayNotificationManager(Context context, String userId) {
         this.context = context;
         this.userId = userId;
     }
 
+    /**
+     * Checks for upcoming birthdays and sends notifications.
+     */
     public void checkBirthdaysAndNotify() {
         FireBaseManager.getContactsForUser(userId, contacts -> {
             contactList = contacts;
@@ -40,6 +52,11 @@ public class BirthdayNotificationManager {
         });
     }
 
+    /**
+     * Creates a notification channel for a specific contact.
+     *
+     * @param contact The contact.
+     */
     private void createNotificationChannel(Contact contact) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelName = "Birthday channel for " + contact.getFirstName();
@@ -51,7 +68,10 @@ public class BirthdayNotificationManager {
         }
     }
 
-    private void createBirthdayContactList(){
+    /**
+     * Creates a list of contacts with upcoming birthdays.
+     */
+    private void createBirthdayContactList() {
         for (Contact contact : contactList) {
             if (CheckDate(contact.getBirthDate())) {
                 birthdayContactList.add(contact);
@@ -59,6 +79,12 @@ public class BirthdayNotificationManager {
         }
     }
 
+    /**
+     * Checks if the given date is today.
+     *
+     * @param date The date in the format "dd/MM".
+     * @return True if the date is today, false otherwise.
+     */
     private boolean CheckDate(String date) {
         String[] parts = date.split("/");
         int day = Integer.parseInt(parts[0]);
@@ -66,10 +92,15 @@ public class BirthdayNotificationManager {
 
         Calendar today = Calendar.getInstance();
         Calendar birthday = Calendar.getInstance();
-        birthday.set(today.get(Calendar.YEAR), month, day); //Ustawiamy rok jako dzisiejszy, aby użyć w porównaniu DAY_OF_YEAR
+        birthday.set(today.get(Calendar.YEAR), month, day); // Set the year as the current year to compare DAY_OF_YEAR
         return today.get(Calendar.DAY_OF_YEAR) == birthday.get(Calendar.DAY_OF_YEAR);
     }
 
+    /**
+     * Shows a birthday notification for the given contact.
+     *
+     * @param contact The contact.
+     */
     private void showBirthdayNotification(Contact contact) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -77,7 +108,7 @@ public class BirthdayNotificationManager {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "ch" + contact.getContactId())
                 .setSmallIcon(R.drawable.ic_launcher_background)
-                .setContentTitle(contact.getFirstName() + " " + contact.getLastName() + " ma dziś urodziny.")
+                .setContentTitle(contact.getFirstName() + " " + contact.getLastName() + " has a birthday today.")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);

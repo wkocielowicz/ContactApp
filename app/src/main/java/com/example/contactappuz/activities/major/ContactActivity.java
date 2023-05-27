@@ -27,6 +27,9 @@ import com.example.contactappuz.util.enums.mode.ActivityModeEnum;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The activity that displays the list of contacts and provides options for filtering and adding/editing contacts.
+ */
 public class ContactActivity extends LanguageActivity implements IActivity {
 
     private static final String CATEGORY_ALL = "All";
@@ -51,6 +54,11 @@ public class ContactActivity extends LanguageActivity implements IActivity {
         attachListeners();
     }
 
+    /**
+     * Retrieves the activity mode from the received Intent data.
+     *
+     * @return The activity mode.
+     */
     public ActivityModeEnum getIntentMode() {
         return (ActivityModeEnum) getIntent().getSerializableExtra("mode");
     }
@@ -130,6 +138,12 @@ public class ContactActivity extends LanguageActivity implements IActivity {
         });
     }
 
+    /**
+     * Retrieves contacts from Firebase based on the selected category.
+     * Updates the adapter with the retrieved contacts.
+     *
+     * @param selectedCategory The selected category to filter the contacts.
+     */
     private void getContactsFromFirebase(String selectedCategory) {
         FireBaseManager.getContactsFromFirebase(this, ActivityUtil.getUserId(), selectedCategory, contactFilter, newContacts -> {
             adapter.updateContacts(newContacts);

@@ -19,6 +19,9 @@ import com.example.contactappuz.util.enums.mode.LoginRegisterModeEnum;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * The activity responsible for user login and registration.
+ */
 public class LoginRegisterActivity extends LanguageActivity implements IActivity {
 
     private Button loginRegisterButton;
@@ -51,7 +54,9 @@ public class LoginRegisterActivity extends LanguageActivity implements IActivity
         }
     }
 
-
+    /**
+     * Initializes the UI components of the activity.
+     */
     @Override
     public void initializeComponents() {
         setContentView(R.layout.activity_login_register);
@@ -67,6 +72,9 @@ public class LoginRegisterActivity extends LanguageActivity implements IActivity
         confirmPasswordEditText = findViewById(R.id.confirmPasswordEditText);
     }
 
+    /**
+     * Attaches listeners to the buttons.
+     */
     @Override
     public void attachListeners() {
         loginRegisterButton.setOnClickListener(view -> {
@@ -86,6 +94,12 @@ public class LoginRegisterActivity extends LanguageActivity implements IActivity
         });
     }
 
+    /**
+     * Performs login with an ad display for the specified email and password.
+     *
+     * @param email    The user's email address.
+     * @param password The user's password.
+     */
     private void loginWithAdsFunction(String email, String password) {
         LoginRegisterManager.loginUser(email, password, task -> {
             if (task.isSuccessful()) {
@@ -106,6 +120,11 @@ public class LoginRegisterActivity extends LanguageActivity implements IActivity
         });
     }
 
+    /**
+     * Performs the login operation with the specified user.
+     *
+     * @param user The logged-in user.
+     */
     private void login(FirebaseUser user) {
         // Navigate to main activity when ad is closed
         Intent intent = new Intent(LoginRegisterActivity.this, MainActivity.class);
@@ -116,20 +135,26 @@ public class LoginRegisterActivity extends LanguageActivity implements IActivity
         finish();
     }
 
+    /**
+     * Performs the registration with the specified email and password.
+     *
+     * @param email    The user's email address.
+     * @param password The user's password.
+     */
     private void registerFunction(String email, String password) {
         String confirmedPassword = confirmPasswordEditText.getText().toString();
 
-        if(password.equals(confirmedPassword)) {
+        if (password.equals(confirmedPassword)) {
             LoginRegisterManager.registerUser(email, password, task -> {
                 if (task.isSuccessful()) {
-                    Toast.makeText(LoginRegisterActivity.this, "Zarejestrowano pomyślnie", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginRegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
                     // Switch to LOGIN mode after successful registration
                     mode = LoginRegisterModeEnum.LOGIN;
                     titleLoginRegisterTextView.setText(R.string.loginTittle);
                     switchModeButton.setText(R.string.loginSwitchToRegister);
                     confirmPasswordEditText.setVisibility(View.GONE);
                 } else {
-                    Toast.makeText(LoginRegisterActivity.this, "Rejestracja nieudana: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginRegisterActivity.this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
         } else {
@@ -137,6 +162,9 @@ public class LoginRegisterActivity extends LanguageActivity implements IActivity
         }
     }
 
+    /**
+     * Switches between login and registration mode.
+     */
     private void switchModeLogic() {
         if (mode == LoginRegisterModeEnum.LOGIN) {
             mode = LoginRegisterModeEnum.REGISTER;
