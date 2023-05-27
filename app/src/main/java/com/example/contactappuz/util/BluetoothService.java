@@ -11,9 +11,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -312,24 +315,41 @@ public class BluetoothService {
         deviceListView.setOnItemClickListener((parent, view, position, id) -> {
             selectedDevice = deviceList.get(position);
 
-            TypedValue typedValue = new TypedValue();
-            Resources.Theme theme = context.getTheme();
-            theme.resolveAttribute(android.R.attr.colorControlHighlight, typedValue, true);
-            int colorAccent = typedValue.data;
-            theme.resolveAttribute(android.R.attr.colorControlNormal, typedValue, true);
-            int colorBackground = typedValue.data;
+            colorAccent(parent, view, position, context);
 
-            for(int i=0; i<parent.getChildCount(); i++) {
-                if(i != position) {
-                    parent.getChildAt(i).setBackgroundColor(colorBackground);
-                }
-            }
-            view.setBackgroundColor(colorAccent);
             //wyzerowanie koloru tła dla innych elementów
             //connectToDevice();
             //mbtnConnect();        //todo pora na wciśnięcie połączenia
         });
 
+    }
+    private void colorAccent(AdapterView parent, View view, int position, Context context) {
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = context.getTheme();
+        theme.resolveAttribute(android.R.attr.colorControlHighlight, typedValue, true);
+        int colorAccent = typedValue.data;
+        theme.resolveAttribute(android.R.attr.colorControlNormal, typedValue, true);
+        int colorBackground = typedValue.data;
+
+        for(int i=0; i<parent.getChildCount(); i++) {
+            if(i != position) {
+                parent.getChildAt(i).setBackgroundColor(colorBackground);
+            }
+        }
+        view.setBackgroundColor(colorAccent);
+    }
+    private boolean isLocationEnabled(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        boolean isGpsEnabled = false;
+        try {
+            isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return isGpsEnabled;
+    }
+    public boolean isBluetoothEnabled(BluetoothAdapter bluetoothAdapter) {
+        return bluetoothAdapter.isEnabled();
     }
 
     @SuppressLint("MissingPermission")
