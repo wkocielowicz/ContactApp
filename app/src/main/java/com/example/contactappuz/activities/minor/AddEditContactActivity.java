@@ -1,14 +1,15 @@
 package com.example.contactappuz.activities.minor;
 
+import static com.example.contactappuz.util.AddressUtil.placeToAddress;
+import static com.example.contactappuz.util.PhotoUtil.bitmapToUriConverter;
+import static com.example.contactappuz.util.PhotoUtil.uriToBitmap;
+
 import android.app.DatePickerDialog;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -18,26 +19,27 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.core.content.FileProvider;
-
 import com.example.contactappuz.R;
 import com.example.contactappuz.activities.IActivity;
 import com.example.contactappuz.activities.LanguageActivity;
 import com.example.contactappuz.activities.util.ActivityUtil;
+import com.example.contactappuz.database.model.Address;
 import com.example.contactappuz.database.model.Contact;
 import com.example.contactappuz.logic.FireBaseManager;
 import com.example.contactappuz.logic.PhotoManager;
 import com.example.contactappuz.util.enums.ContactCategoryEnum;
 import com.example.contactappuz.util.enums.mode.ActivityModeEnum;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -55,9 +57,14 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
     private Spinner categorySpinner;
     private ImageView photoImageView;
 
+    PlacesClient placesClient;
+
     private ActivityModeEnum mode;
     private Uri selectedImageUri;
+    private Address selectedAddress;
     private static final int PICK_IMAGE_REQUEST_CODE = 1;
+    private static final int AUTOCOMPLETE_REQUEST_CODE = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +83,13 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
             Uri imageUri = data.getData();
             selectedImageUri = imageUri;
             photoImageView.setImageURI(imageUri);
+        }
+
+        if (requestCode == AUTOCOMPLETE_REQUEST_CODE && resultCode == RESULT_OK) {
+            Place selectedPlace = Autocomplete.getPlaceFromIntent(data);
+
+            selectedAddress = placeToAddress(selectedPlace);
+            addressEditText.setText(selectedAddress.getAddress());
         }
     }
 
@@ -107,6 +121,9 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
         if (mode == ActivityModeEnum.EDIT) {
             setFields();
         }
+
+        Places.initialize(getApplicationContext(), "AIzaSyBd9vdotS9KZiTAhj6wkjV5irrRD6f12u8");
+        placesClient = Places.createClient(this);
     }
 
     @Override
@@ -145,6 +162,14 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(intent, PICK_IMAGE_REQUEST_CODE);
         });
+
+        addressEditText.setOnClickListener(view -> {
+            List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG);
+
+            Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, fields)
+                    .build(this);
+            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE);
+        });
     }
 
     /**
@@ -155,7 +180,7 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
         if (contact != null) {
             firstNameEditText.setText(contact.getFirstName());
             lastNameEditText.setText(contact.getLastName());
-            addressEditText.setText(contact.getAddress());
+            addressEditText.setText(contact.getAddress().getAddress());
             birthDateEditText.setText(contact.getBirthDate());
             int spinnerPosition = ((ArrayAdapter<String>) categorySpinner.getAdapter()).getPosition(contact.getCategory());
             categorySpinner.setSelection(spinnerPosition);
@@ -177,7 +202,7 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
 
         contact.setFirstName(firstNameEditText.getText().toString());
         contact.setLastName(lastNameEditText.getText().toString());
-        contact.setAddress(addressEditText.getText().toString());
+        contact.setAddress(selectedAddress);
         contact.setBirthDate(birthDateEditText.getText().toString());
         contact.setCategory(categorySpinner.getSelectedItem().toString());
 
@@ -239,37 +264,13 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
     }
 
     /**
-     * Converts a Uri to a Bitmap.
-     *
-     * @param selectedFileUri The Uri of the selected image.
-     * @return The Bitmap object.
-     */
-    private Bitmap uriToBitmap(Uri selectedFileUri) {
-        Bitmap image = null;
-        try {
-            InputStream inputStream = getContentResolver().openInputStream(selectedFileUri);
-            Bitmap originalImage = BitmapFactory.decodeStream(inputStream);
-            if (originalImage != null) {
-                image = scaleBitmap(originalImage, 400, 400);
-            }
-            if (inputStream != null) {
-                inputStream.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("AddEditContactActivity", "Error during converting Uri to Bitmap: ", e);
-        }
-        return image;
-    }
-
-    /**
      * Saves a contact to the Firebase database.
      *
      * @param contact The Contact object to be saved.
      */
     private void saveContact(Contact contact) {
-        Bitmap scaledBitmap = uriToBitmap(selectedImageUri);
-        Uri scaledImageUri = bitmapToUriConverter(scaledBitmap);
+        Bitmap scaledBitmap = uriToBitmap(selectedImageUri, AddEditContactActivity.this);
+        Uri scaledImageUri = bitmapToUriConverter(scaledBitmap, AddEditContactActivity.this);
 
         if (!PhotoManager.saveImageToDevice(AddEditContactActivity.this, scaledBitmap, contact.getPhotoPath())) {
             Toast.makeText(AddEditContactActivity.this, "Failed to save photo on device.", Toast.LENGTH_SHORT).show();
@@ -289,8 +290,8 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
      * @param contact The Contact object to be updated.
      */
     private void updateContact(Contact contact) {
-        Bitmap scaledBitmap = uriToBitmap(selectedImageUri);
-        Uri scaledImageUri = bitmapToUriConverter(scaledBitmap);
+        Bitmap scaledBitmap = uriToBitmap(selectedImageUri, AddEditContactActivity.this);
+        Uri scaledImageUri = bitmapToUriConverter(scaledBitmap, AddEditContactActivity.this);
 
         if (!PhotoManager.saveImageToDevice(AddEditContactActivity.this, scaledBitmap, contact.getPhotoPath())) {
             Toast.makeText(AddEditContactActivity.this, "Failed to save photo on device.", Toast.LENGTH_SHORT).show();
@@ -307,47 +308,4 @@ public class AddEditContactActivity extends LanguageActivity implements IActivit
             Toast.makeText(AddEditContactActivity.this, "Failed to update contact", Toast.LENGTH_SHORT).show();
         }
     }
-
-    /**
-     * Scales a Bitmap to a given width and height.
-     *
-     * @param bitmap The Bitmap to scale.
-     * @param newWidth The new width of the Bitmap.
-     * @param newHeight The new height of the Bitmap.
-     * @return The scaled Bitmap.
-     */
-    private Bitmap scaleBitmap(Bitmap bitmap, int newWidth, int newHeight) {
-        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
-    }
-
-    /**
-     * This method is used to convert the bitmap to uri.
-     * @param mBitmap This is the bitmap which is to be converted to uri.
-     * @return Uri This returns the Uri of the saved image.
-     */
-    private Uri bitmapToUriConverter(Bitmap mBitmap) {
-        // Get the context wrapper
-        ContextWrapper wrapper = new ContextWrapper(getApplicationContext());
-
-        // Initialize a new file in specific directory
-        File file = wrapper.getExternalFilesDir("Images");
-        file = new File(file, "UniqueFileName"+".jpg");
-
-        try {
-            // Compress the bitmap and save in the file
-            OutputStream stream = null;
-            stream = new FileOutputStream(file);
-            mBitmap.compress(Bitmap.CompressFormat.JPEG,100,stream);
-            stream.flush();
-            stream.close();
-
-        } catch (IOException e) // Catch the exception
-        {
-            e.printStackTrace();
-        }
-
-        // Return the saved bitmap uri
-        return FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", file);
-    }
-
 }

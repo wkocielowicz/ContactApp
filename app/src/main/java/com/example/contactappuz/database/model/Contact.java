@@ -11,7 +11,7 @@ public class Contact implements Serializable {
     private String category;
     private String firstName;
     private String lastName;
-    private String address;
+    private Address address;
     private String birthDate;
     private String photoUrl;
     private String photoPath;
@@ -32,7 +32,7 @@ public class Contact implements Serializable {
      * @param address    The address of the contact.
      * @param birthDate  The birth date of the contact.
      */
-    public Contact(String category, String firstName, String lastName, String address, String birthDate) {
+    public Contact(String category, String firstName, String lastName, Address address, String birthDate) {
         this.contactId = UUID.randomUUID().toString();
         this.category = category;
         this.firstName = firstName;
@@ -118,7 +118,7 @@ public class Contact implements Serializable {
      *
      * @return The contact's address.
      */
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
@@ -127,7 +127,7 @@ public class Contact implements Serializable {
      *
      * @param address The address to set.
      */
-    public void setAddress(String address) {
+    public void setAddress(Address address) {
         this.address = address;
     }
 
@@ -184,4 +184,5 @@ public class Contact implements Serializable {
     public void setPhotoPath(String photoPath) {
         this.photoPath = photoPath;
     }
+
 }

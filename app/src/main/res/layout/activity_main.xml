@@ -13,7 +13,7 @@
         android:id="@+id/go_to_contact_activity_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Przejdź do ContactActivity" />
+        android:text="@string/mainGoToContactActivity" />
 
     <Button
         android:id="@+id/change_language_button"

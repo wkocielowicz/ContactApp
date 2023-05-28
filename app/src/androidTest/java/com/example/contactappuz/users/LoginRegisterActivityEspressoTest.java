@@ -63,7 +63,7 @@ public class LoginRegisterActivityEspressoTest {
         }
 
         // Sprawdź, czy Toast z odpowiednim komunikatem jest wyświetlony
-        onView(withText(R.string.passwords_do_not_match))
+        onView(withText(R.string.passwordsDoNotMatch))
                 .inRoot(withDecorView(not(decorView)))
                 .check(matches(isDisplayed()));
 
