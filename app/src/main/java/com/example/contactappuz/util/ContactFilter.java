@@ -151,7 +151,7 @@ public class ContactFilter {
                     comparator = Comparator.comparing(Contact::getLastName, String.CASE_INSENSITIVE_ORDER);
                     break;
                 case ADDRESS:
-                    comparator = Comparator.comparing(Contact::getAddress, String.CASE_INSENSITIVE_ORDER);
+                    comparator = Comparator.comparing(contact -> contact.getAddress().getAddress(), String.CASE_INSENSITIVE_ORDER);
                     break;
                 case BIRTH_DATE:
                     comparator = Comparator.comparing(Contact::getBirthDate);

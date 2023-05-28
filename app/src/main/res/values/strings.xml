@@ -5,9 +5,14 @@
     <string name="contactRowLastName">Last name: </string>
     <string name="contactRowAddress">Address: </string>
     <string name="contactRowBirth">Birth date: </string>
+    <string name="contactRowDelete">Delete</string>
+    <string name="contactRowUpdate">Update</string>
+    <string name="contactRowGo">Go</string>
+
 
     <!-- Main -->
     <string name="mainSwitchLanguage">Switch language</string>
+    <string name="mainGoToContactActivity">Go to ContactActivity</string>
 
     <!-- AddContact -->
     <string name="addContactFirstNameHint">First name</string>
@@ -33,6 +38,6 @@
     <string name="registrationTittle">Registration</string>
     <string name="registerSwitchToLogin">Log in</string>
     <string name="loginRegisterConfirmPassword">Confirm password</string>
-    <string name="passwords_do_not_match">The entered passwords do not match!</string>
+    <string name="passwordsDoNotMatch">The entered passwords do not match!</string>
 
 </resources>

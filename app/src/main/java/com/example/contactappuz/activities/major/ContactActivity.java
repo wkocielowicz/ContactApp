@@ -19,6 +19,7 @@ import com.example.contactappuz.activities.util.ActivityUtil;
 import com.example.contactappuz.activities.util.FilterDialog;
 import com.example.contactappuz.database.model.Contact;
 import com.example.contactappuz.logic.FireBaseManager;
+import com.example.contactappuz.logic.NavigateManager;
 import com.example.contactappuz.util.ContactFilter;
 import com.example.contactappuz.util.ContactRowAdapter;
 import com.example.contactappuz.util.enums.ContactCategoryEnum;
@@ -94,6 +95,11 @@ public class ContactActivity extends LanguageActivity implements IActivity {
                         Toast.makeText(ContactActivity.this, "Failed to delete contact", Toast.LENGTH_SHORT).show();
                     }
                 });
+            }
+
+            @Override
+            public void onNavigateButtonClick(Contact contact) {
+                NavigateManager.navigateTo(ContactActivity.this, contact.getAddress().getLat(), contact.getAddress().getLng());
             }
         });
 

@@ -158,7 +158,7 @@ public class LoginRegisterActivity extends LanguageActivity implements IActivity
                 }
             });
         } else {
-            Toast.makeText(LoginRegisterActivity.this, R.string.passwords_do_not_match, Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginRegisterActivity.this, R.string.passwordsDoNotMatch, Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -71,7 +71,7 @@ public class FireBaseManager {
                 List<Contact> filteredContacts = contactList.stream()
                         .filter(c -> contactFilter.getFirstNameFilter() == null || c.getFirstName().toLowerCase().contains(contactFilter.getFirstNameFilter().toLowerCase()))
                         .filter(c -> contactFilter.getLastNameFilter() == null || c.getLastName().toLowerCase().contains(contactFilter.getLastNameFilter().toLowerCase()))
-                        .filter(c -> contactFilter.getAddressFilter() == null || c.getAddress().toLowerCase().contains(contactFilter.getAddressFilter().toLowerCase()))
+                        .filter(c -> contactFilter.getAddressFilter() == null || c.getAddress().getAddress().toLowerCase().contains(contactFilter.getAddressFilter().toLowerCase()))
                         .filter(c -> contactFilter.getBirthDateFilter() == null || c.getBirthDate().toLowerCase().contains(contactFilter.getBirthDateFilter().toLowerCase()))
                         .sorted(contactFilter.getComparator())
                         .collect(Collectors.toList());

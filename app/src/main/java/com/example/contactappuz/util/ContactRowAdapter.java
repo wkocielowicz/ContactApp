@@ -33,6 +33,8 @@ public class ContactRowAdapter extends RecyclerView.Adapter<ContactRowAdapter.My
         void onUpdateButtonClick(Contact contact);
 
         void onDeleteButtonClick(Contact contact);
+
+        void onNavigateButtonClick(Contact contact);
     }
 
     /**
@@ -69,7 +71,7 @@ public class ContactRowAdapter extends RecyclerView.Adapter<ContactRowAdapter.My
         Contact contact = contactList.get(position);
         holder.firstName.setText(contact.getFirstName());
         holder.lastName.setText(contact.getLastName());
-        holder.address.setText(contact.getAddress());
+        holder.address.setText(contact.getAddress().getAddress());
         holder.birthDate.setText(contact.getBirthDate());
         holder.category.setText(contact.getCategory());
 
@@ -89,7 +91,7 @@ public class ContactRowAdapter extends RecyclerView.Adapter<ContactRowAdapter.My
      */
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView firstName, lastName, address, birthDate, category;
-        Button deleteButton, updateButton;
+        Button deleteButton, updateButton, navigateButton;
         ImageView photo;
 
         public MyViewHolder(@NonNull View itemView) {
@@ -102,6 +104,7 @@ public class ContactRowAdapter extends RecyclerView.Adapter<ContactRowAdapter.My
 
             deleteButton = itemView.findViewById(R.id.delete_button);
             updateButton = itemView.findViewById(R.id.update_button);
+            navigateButton = itemView.findViewById(R.id.navigateButton);
             photo = itemView.findViewById(R.id.photoView);
 
             deleteButton.setOnClickListener(view -> {
@@ -116,6 +119,13 @@ public class ContactRowAdapter extends RecyclerView.Adapter<ContactRowAdapter.My
                 if (onItemClickListener != null) {
                     Contact contact = contactList.get(getAdapterPosition());
                     onItemClickListener.onUpdateButtonClick(contact);
+                }
+            });
+
+            navigateButton.setOnClickListener(v -> {
+                if (onItemClickListener != null) {
+                    Contact contact = contactList.get(getAdapterPosition());
+                    onItemClickListener.onNavigateButtonClick(contact);
                 }
             });
         }
