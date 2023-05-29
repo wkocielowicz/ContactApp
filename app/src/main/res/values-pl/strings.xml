@@ -29,4 +29,5 @@
     <string name="contactRowUpdate">Dodaj</string>
     <string name="contactRowGo">Idź</string>
     <string name="mainGoToContactActivity">Przejdź do ContactActivity</string>
+    <string name="mainLogout" >Wyloguj</string>
 </resources>

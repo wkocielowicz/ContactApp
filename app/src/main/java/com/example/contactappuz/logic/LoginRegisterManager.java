@@ -35,6 +35,13 @@ public class LoginRegisterManager {
     }
 
     /**
+     * Signs out the currently signed-in user.
+     */
+    public static void signOutUser() {
+        auth.signOut();
+    }
+
+    /**
      * Sets the FirebaseAuth instance for testing purposes.
      *
      * @param mAuth  The FirebaseAuth instance to set.

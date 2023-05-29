@@ -36,11 +36,6 @@ public class PhotoUtil {
     /**
      * This method is used to convert the bitmap to uri.
      * @param mBitmap This is the bitmap which is to be converted to uri.
-     * @return Uri This returns the Uri of the saved image.
-     */
-    /**
-     * This method is used to convert the bitmap to uri.
-     * @param mBitmap This is the bitmap which is to be converted to uri.
      * @param context The context from the application or activity
      * @return Uri This returns the Uri of the saved image.
      */

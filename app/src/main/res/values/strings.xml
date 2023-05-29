@@ -13,6 +13,7 @@
     <!-- Main -->
     <string name="mainSwitchLanguage">Switch language</string>
     <string name="mainGoToContactActivity">Go to ContactActivity</string>
+    <string name="mainLogout" >Logout</string>
 
     <!-- AddContact -->
     <string name="addContactFirstNameHint">First name</string>

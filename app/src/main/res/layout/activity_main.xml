@@ -1,25 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center"
     tools:context=".activities.major.MainActivity">
 
-    <Button
-        android:id="@+id/go_to_contact_activity_button"
+    <RelativeLayout
+        android:id="@+id/button_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/mainGoToContactActivity" />
+        android:layout_centerInParent="true">
+
+        <Button
+            android:id="@+id/go_to_contact_activity_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mainGoToContactActivity"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:id="@+id/change_language_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/go_to_contact_activity_button"
+            android:layout_marginTop="16dp"
+            android:text="@string/mainSwitchLanguage"
+            android:layout_centerHorizontal="true" />
+
+    </RelativeLayout>
 
     <Button
-        android:id="@+id/change_language_button"
+        android:id="@+id/logout_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/mainSwitchLanguage"
-        android:layout_marginTop="16dp"/>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/mainLogout" />
 
-</LinearLayout>
+</RelativeLayout>

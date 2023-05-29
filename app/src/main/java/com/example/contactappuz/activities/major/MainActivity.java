@@ -3,6 +3,7 @@ package com.example.contactappuz.activities.major;
 import static com.example.contactappuz.activities.util.ActivityUtil.getUserId;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
@@ -11,6 +12,7 @@ import com.example.contactappuz.R;
 import com.example.contactappuz.activities.IActivity;
 import com.example.contactappuz.activities.LanguageActivity;
 import com.example.contactappuz.logic.AdManager;
+import com.example.contactappuz.logic.LoginRegisterManager;
 import com.example.contactappuz.logic.services.BirthdayNotificationService;
 import com.example.contactappuz.util.enums.mode.ActivityModeEnum;
 
@@ -23,6 +25,7 @@ public class MainActivity extends LanguageActivity implements IActivity {
 
     private Button goToContactActivityButton;
     private Button changeLanguageButton;
+    private Button logoutButton;
     private AdManager adManager;
 
     private ActivityModeEnum mode;
@@ -59,7 +62,7 @@ public class MainActivity extends LanguageActivity implements IActivity {
 
         goToContactActivityButton = findViewById(R.id.go_to_contact_activity_button);
         changeLanguageButton = findViewById(R.id.change_language_button);
-
+        logoutButton = findViewById(R.id.logout_button);
     }
 
     /**
@@ -77,6 +80,20 @@ public class MainActivity extends LanguageActivity implements IActivity {
             } else {
                 changeLanguage("pl");
             }
+        });
+
+        logoutButton.setOnClickListener(view -> {
+            LoginRegisterManager.signOutUser();
+
+            // Clear shared preferences
+            SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
+
+            Intent intent = new Intent(MainActivity.this, LoginRegisterActivity.class);
+            startActivity(intent);
+            finish();
         });
     }
 
