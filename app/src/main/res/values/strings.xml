@@ -1,6 +1,7 @@
 <resources>
-    <!-- ContactRow -->
     <string name="app_name">ContactAppUZ</string>
+
+    <!-- ContactRow -->
     <string name="contactRowFirstName">First name: </string>
     <string name="contactRowLastName">Last name: </string>
     <string name="contactRowAddress">Address: </string>
@@ -11,9 +12,11 @@
 
 
     <!-- Main -->
+    <string name="mainTitle">Menu</string>
     <string name="mainSwitchLanguage">Switch language</string>
     <string name="mainGoToContactActivity">Go to ContactActivity</string>
     <string name="mainLogout" >Logout</string>
+    <string name="mainStatistics">Statistics</string>
 
     <!-- AddContact -->
     <string name="addContactFirstNameHint">First name</string>
@@ -40,5 +43,12 @@
     <string name="registerSwitchToLogin">Log in</string>
     <string name="loginRegisterConfirmPassword">Confirm password</string>
     <string name="passwordsDoNotMatch">The entered passwords do not match!</string>
+
+    <!-- Statistics -->
+    <string name="statisticsTitle">Statistics</string>
+    <string name="statisticsTodaySteps">Today steps:</string>
+    <string name="statisticsTotalSteps">Total steps:</string>
+    <string name="statisticsExit">Exit</string>
+
 
 </resources>

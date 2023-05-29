@@ -12,13 +12,10 @@
     <uses-permission android:name="android.permission.INTERNET" /><!-- -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
 
     <application
         android:usesCleartextTraffic="true"
-
-
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -83,10 +80,18 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-
+        <activity
+            android:name=".activities.minor.StatisticsActivity"
+            android:exported="true">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <service
             android:name=".logic.services.BirthdayNotificationService"
             android:exported="false" />
+        <service android:name=".logic.services.StepCounterService" />
+
 
         <provider
             android:name="androidx.core.content.FileProvider"

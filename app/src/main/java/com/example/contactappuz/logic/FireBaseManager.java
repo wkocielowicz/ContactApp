@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.example.contactappuz.database.model.Contact;
+import com.example.contactappuz.database.model.Statistics;
 import com.example.contactappuz.util.ContactFilter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -43,6 +44,16 @@ public class FireBaseManager {
      * @return The DatabaseReference for the user's contacts.
      */
     private static DatabaseReference getReferenceForUser(String userId) {
+        return FirebaseDatabase.getInstance().getReference("users/" + userId);
+    }
+
+    /**
+     * Retrieves the database reference for contacts for a specific user .
+     *
+     * @param userId The user ID.
+     * @return The DatabaseReference for the user's contacts.
+     */
+    private static DatabaseReference getReferenceForContacts(String userId) {
         return FirebaseDatabase.getInstance().getReference("users/" + userId + "/contacts");
     }
 
@@ -56,7 +67,7 @@ public class FireBaseManager {
      * @param onContactsFetched A consumer to handle the fetched contacts.
      */
     public static void getContactsFromFirebase(Activity activity, String userId, String selectedCategory, ContactFilter contactFilter, Consumer<List<Contact>> onContactsFetched) {
-        getReferenceForUser(userId).addValueEventListener(new ValueEventListener() {
+        getReferenceForContacts(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Contact> contactList = new ArrayList<>();
@@ -93,7 +104,7 @@ public class FireBaseManager {
      * @param onContactsFetched A consumer to handle the fetched contacts.
      */
     public static void getContactsForUser(String userId, Consumer<List<Contact>> onContactsFetched) {
-        getReferenceForUser(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+        getReferenceForContacts(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Contact> contactList = new ArrayList<>();
@@ -122,7 +133,7 @@ public class FireBaseManager {
      * @param onTaskCompleted   A consumer to handle the task completion.
      */
     public static void addContact(Activity activity, String userId, Contact contact, Uri imageUri, Consumer<Task<Void>> onTaskCompleted) {
-        DatabaseReference newContactRef = getReferenceForUser(userId).push();
+        DatabaseReference newContactRef = getReferenceForContacts(userId).push();
         contact.setContactId(newContactRef.getKey()); // assumes your Contact class has a setter for contactId
 
         uploadContactImageToFirebaseStorage(contact, imageUri, new OnFailureListener() {
@@ -158,7 +169,7 @@ public class FireBaseManager {
             }
         });
 
-        getReferenceForUser(userId).orderByChild("contactId").equalTo(contactId).addListenerForSingleValueEvent(new ValueEventListener() {
+        getReferenceForContacts(userId).orderByChild("contactId").equalTo(contactId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot contactSnapshot : dataSnapshot.getChildren()) {
@@ -188,7 +199,7 @@ public class FireBaseManager {
     public static void deleteContact(String userId, String contactId, OnCompleteListener<Void> onCompleteListener) {
         DatabaseReference contactsRef = FirebaseDatabase.getInstance().getReference("contacts");
 
-        getReferenceForUser(userId).orderByChild("contactId").equalTo(contactId).addListenerForSingleValueEvent(new ValueEventListener() {
+        getReferenceForContacts(userId).orderByChild("contactId").equalTo(contactId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot contactSnapshot : dataSnapshot.getChildren()) {
@@ -246,4 +257,40 @@ public class FireBaseManager {
         }
     }
 
+    /**
+     * Saves the user's statistics to Firebase database.
+     *
+     * @param userId       The user ID.
+     * @param statistics   The statistics object to save.
+     */
+    public static void saveStatistics(String userId, Statistics statistics) {
+        DatabaseReference statisticsRef = getReferenceForUser(userId).child("statistics");
+        statisticsRef.setValue(statistics).addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.e("FirebaseError", "Failed to save statistics: " + task.getException().getMessage());
+            }
+        });
+    }
+
+    /**
+     * Retrieves the user's statistics from Firebase database.
+     *
+     * @param userId             The user ID.
+     * @param onStatisticsFetched A consumer to handle the fetched statistics.
+     */
+    public static void getStatistics(String userId, Consumer<Statistics> onStatisticsFetched) {
+        DatabaseReference statisticsRef = getReferenceForUser(userId).child("statistics");
+        statisticsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Statistics statistics = dataSnapshot.getValue(Statistics.class);
+                onStatisticsFetched.accept(statistics);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("FirebaseError", "Failed to fetch statistics: " + databaseError.getMessage());
+            }
+        });
+    }
 }
