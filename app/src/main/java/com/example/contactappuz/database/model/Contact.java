@@ -32,12 +32,12 @@ public class Contact implements Serializable {
      * @param address    The address of the contact.
      * @param birthDate  The birth date of the contact.
      */
-    public Contact(String category, String firstName, String lastName, Address address, String birthDate) {
+    public Contact(String category, String firstName, String lastName, String address, String birthDate) {
         this.contactId = UUID.randomUUID().toString();
         this.category = category;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.address = address;
+        this.address.setAddress(address);
         this.birthDate = birthDate;
     }
 

@@ -1,11 +1,13 @@
 package com.example.contactappuz.database.model;
 
+import java.io.Serializable;
+
 /**
  * The Address class represents an address for a contact in the ContactAppUZ application.
  * Each address has a unique place id (placeId) assigned by the Google Place API,
  * an address in text format, and a location in the form of latitude and longitude.
  */
-public class Address {
+public class Address implements Serializable  {
 
     private String placeId;
     private String address;
