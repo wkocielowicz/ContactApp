@@ -30,4 +30,10 @@
     <string name="contactRowGo">Idź</string>
     <string name="mainGoToContactActivity">Przejdź do ContactActivity</string>
     <string name="mainLogout" >Wyloguj</string>
+    <string name="mainStatistics">Statystyki</string>
+    <string name="mainTitle">Menu</string>
+    <string name="statisticsExit">Wyjście</string>
+    <string name="statisticsTotalSteps">Wszystkie kroki:</string>
+    <string name="statisticsTodaySteps">Dzisiejsze kroki:</string>
+    <string name="statisticsTitle">Statystyki</string>
 </resources>

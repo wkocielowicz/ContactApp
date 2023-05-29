@@ -7,6 +7,7 @@ import java.util.UUID;
  * Represents a Contact in the application.
  */
 public class Contact implements Serializable {
+
     private String contactId;
     private String category;
     private String firstName;

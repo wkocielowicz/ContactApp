@@ -3,58 +3,69 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.major.MainActivity">
+    tools:context=".activities.minor.StatisticsActivity">
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="@string/mainTitle"
+        android:text="@string/statisticsTitle"
         android:textSize="60sp"
         android:layout_marginTop="16dp" />
 
     <RelativeLayout
-        android:id="@+id/button_container"
+        android:id="@+id/stats_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true">
 
-        <Button
-            android:id="@+id/go_to_contact_activity_button"
+        <TextView
+            android:id="@+id/today_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/mainGoToContactActivity"
+            android:text="@string/statisticsTodaySteps"
+            android:textSize="18sp"
             android:layout_centerHorizontal="true" />
 
-        <Button
-            android:id="@+id/change_language_button"
+        <TextView
+            android:id="@+id/today_steps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/go_to_contact_activity_button"
+            android:layout_below="@+id/today_label"
             android:layout_marginTop="16dp"
-            android:text="@string/mainSwitchLanguage"
+            android:textSize="18sp"
             android:layout_centerHorizontal="true" />
 
-        <Button
-            android:id="@+id/go_to_statistics_button"
+        <TextView
+            android:id="@+id/total_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/change_language_button"
+            android:layout_below="@+id/today_steps"
+            android:layout_marginTop="32dp"
+            android:text="@string/statisticsTotalSteps"
+            android:textSize="18sp"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:id="@+id/total_steps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/total_label"
             android:layout_marginTop="16dp"
-            android:text="@string/mainStatistics"
+            android:textSize="18sp"
             android:layout_centerHorizontal="true" />
 
     </RelativeLayout>
 
     <Button
-        android:id="@+id/logout_button"
+        android:id="@+id/exit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/mainLogout" />
+        android:text="@string/statisticsExit" />
 
 </RelativeLayout>
