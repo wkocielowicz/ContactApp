@@ -21,7 +21,7 @@ package com.example.contactappuz.util;
  * Aby użyć - należy postawić obiekt w wybranej klasie i wywołać metodę w funkcji inicjalizacyjnej
  * Wystarczy zignorować błędy, lub dodać atrybut {@code @SuppressLint("MissingPermission")}
  * nad metodami z błędami, jednak nieprzewidziane są przypadki w których nie otrzymano zgody.
- * */
+ */
 public class PermissionChecker {
     private Context context;
     private static String[] PERMISSIONS_STORAGE = {

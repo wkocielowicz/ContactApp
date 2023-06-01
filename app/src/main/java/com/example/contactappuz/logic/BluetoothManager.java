@@ -1,4 +1,4 @@
-package com.example.contactappuz.util;
+package com.example.contactappuz.logic;
 
 
 import android.annotation.SuppressLint;
@@ -13,6 +13,7 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -22,24 +23,34 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.contactappuz.R;
+import com.example.contactappuz.util.ConnectedBluetoothThread;
+import com.example.contactappuz.util.PermissionChecker;
+import com.example.contactappuz.util.enums.BluetoothSearchTypeFlag;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.UUID;
 
 
-public class BluetoothService {
-    private static final String TAG = "BluetoothService";
+public class BluetoothManager {
+    private static final String TAG = "BluetoothManager";
     private static final int REQUEST_ENABLE_BT = 1;
 
-    static final UUID mUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    public interface MessageConstants {
+        public static final int MESSAGE_READ = 0;
+        public static final int MESSAGE_WRITE = 1;
+        public static final int MESSAGE_TOAST = 2;
+    }
+    private ConnectedBluetoothThread connectedThread;
+
+    public static final UUID mUUID = UUID.fromString("69135e98-da96-4fce-9219-5da65a4909ea");
     byte[] buffer = new byte[1024];
     int bytes;
     String Data="";
-
-    //todo Send
+        //todo Send
     /*
     private BluetoothAdapter bluetoothAdapter;
     private ArrayAdapter<String> deviceListAdapter;
@@ -115,7 +126,7 @@ public class BluetoothService {
         }
     }
 */
-    //todo Recive
+    //todo Receive
     /*
     private BluetoothAdapter bluetoothAdapter;
     private BroadcastReceiver broadcastReceiver;
@@ -274,11 +285,11 @@ public class BluetoothService {
 
     PermissionChecker permissionChecker;// = new PermissionChecker(this);
 
-    private BluetoothAdapter bluetoothAdapter;
+    private final BluetoothAdapter bluetoothAdapter;
     private BluetoothDevice selectedDevice;
     private BluetoothSocket bluetoothSocket = null;
     private ArrayAdapter<String> deviceListAdapter;
-    private ArrayList<BluetoothDevice> deviceList = new ArrayList<>();
+    private final ArrayList<BluetoothDevice> deviceList = new ArrayList<>();
     private ListView deviceListView;
 
     //private String uuidString = "INSERT_YOUR_UUID_HERE";
@@ -286,15 +297,18 @@ public class BluetoothService {
     private InputStream inputStream;
     private volatile boolean stopWorker;
 
+    private static int previousDeviceListSize;
+    private Handler handler = new Handler();
+    private Activity bluetoothActivity;
 
     @SuppressLint("MissingPermission")
-    public BluetoothService(Context context) {
-        Activity activity = (Activity) context;
+    public BluetoothManager(Context context) {
+        bluetoothActivity = (Activity) context;
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
             Toast.makeText(context, "Urządzenie nie ma modułu Bluetooth", Toast.LENGTH_LONG).show();
-            activity.finish();      //TODO warto zareagować na to lepiej
+            bluetoothActivity.finish();      //TODO warto zareagować na to lepiej
             return;
         }
         permissionChecker = new PermissionChecker(context);
@@ -303,14 +317,14 @@ public class BluetoothService {
 
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);     //TODO do rozwiązania
+            bluetoothActivity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);     //TODO do rozwiązania
         }
 
         //selectedDevice = bluetoothAdapter.getRemoteDevice("");//TODO do poprawy - szukaj i sparuj urządzenia
 
 
         deviceListAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
-        deviceListView = activity.findViewById(R.id.deviceListView);
+        deviceListView = bluetoothActivity.findViewById(R.id.deviceListView);
         deviceListView.setAdapter(deviceListAdapter);
         deviceListView.setOnItemClickListener((parent, view, position, id) -> {
             selectedDevice = deviceList.get(position);
@@ -321,8 +335,17 @@ public class BluetoothService {
             //connectToDevice();
             //mbtnConnect();        //todo pora na wciśnięcie połączenia
         });
+        previousDeviceListSize = 0;
 
     }
+
+    /**
+     * Colorise the selected device element from ListView.
+     * @param parent Every element of the device list.
+     * @param view The view of the selected element.
+     * @param position The index of the selected element.
+     * @param context The activity context.
+     */
     private void colorAccent(AdapterView parent, View view, int position, Context context) {
         TypedValue typedValue = new TypedValue();
         Resources.Theme theme = context.getTheme();
@@ -338,8 +361,12 @@ public class BluetoothService {
         }
         view.setBackgroundColor(colorAccent);
     }
-    private boolean isLocationEnabled(Context context) {
-        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+    /**
+     * Checks the localisation is turned on.
+     * @return True if localisation is turned on, false if localisation is turned off, or if localisation isn't avaible.
+     */
+    private boolean isLocationEnabled() {
+        LocationManager locationManager = (LocationManager) bluetoothActivity.getSystemService(Context.LOCATION_SERVICE);
         boolean isGpsEnabled = false;
         try {
             isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -348,22 +375,56 @@ public class BluetoothService {
         }
         return isGpsEnabled;
     }
-    public boolean isBluetoothEnabled(BluetoothAdapter bluetoothAdapter) {
-        return bluetoothAdapter.isEnabled();
+
+    /**
+     * Checks if bluetooth is turned on.
+     * @return True if bluetooth is turned on, false if bluetooth is turned off, or if there's no bluetooth avaible.
+     */
+    public boolean isBluetoothEnabled() {
+        return bluetoothAdapter != null && bluetoothAdapter.isEnabled();
     }
 
+    /**
+     * Starts the discovery of the devices.
+     * broadcastReceiver onReceive() updates the list of devices.
+     * It's purging the deviceList.
+     * Found devices will be accessable through deviceList.
+     * @param availableModes The modes representing the set of devices you want to show.
+     */
     @SuppressLint("MissingPermission")
-    public void mbtnDiscover(Activity activity) {
-        if (!bluetoothAdapter.isDiscovering()) {
-            deviceList.clear();
-            deviceListAdapter.clear();
-            IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-                activity.registerReceiver(broadcastReceiver, filter);
-                bluetoothAdapter.startDiscovery();
+    public void Discover(BluetoothSearchTypeFlag availableModes) {
+        deviceList.clear();
+        deviceListAdapter.clear();
+        previousDeviceListSize = 0;
+
+        if(availableModes.containFlag(BluetoothSearchTypeFlag.UNKNOWN_DEVICES)){
+            discoverUnknownDevices();
+        }
+        if(availableModes.containFlag(BluetoothSearchTypeFlag.ALL_PAIRED_DEVICES)){
+            discoverPairedDevices(false);
+        }else if(availableModes.containFlag(BluetoothSearchTypeFlag.AVAILABLE_PAIRED_DEVICES)) {
+            discoverPairedDevices(true);    //It doesn't work properly
         }
     }
 
+    @SuppressLint("MissingPermission")
+    private void UpdateDeviceListUI(){
+        int currentSize = deviceList.size();
+        // Sprawdź, czy rozmiar listy urządzeń wzrósł
+        if (currentSize > previousDeviceListSize) {
+            // Dodaj nowe urządzenia do adaptera i zaktualizuj widok listy
+            for (int i = previousDeviceListSize; i < currentSize; i++) {
+                BluetoothDevice device = deviceList.get(i);
+                deviceListAdapter.add(device.getName() + " - " + device.getAddress());
+            }
+            previousDeviceListSize = currentSize;
+        }
+    }
 
+    /**
+     * It's listening for found devices.
+     * Puts them into deviceList
+     */
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @SuppressLint("MissingPermission")
         @Override
@@ -372,18 +433,30 @@ public class BluetoothService {
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 deviceList.add(device);
-                deviceListAdapter.add(device.getName() + "\n" + device.getAddress());
-                deviceListAdapter.notifyDataSetChanged();
+                UpdateDeviceListUI();
             }
         }
     };
 
-    public void closeBluetoothSocket(){
+    public void CloseBluetooth(){
+        CloseBluetoothSocket();
+        CancelDiscovery();
+    }
+    public void CloseBluetoothSocket(){
         try {
             bluetoothSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    public void CancelDiscovery(){
+        if (bluetoothAdapter.isDiscovering()) {
+            // Przerwij wyszukiwanie urządzeń Bluetooth
+            bluetoothAdapter.cancelDiscovery();
+        }
+        bluetoothActivity.unregisterReceiver(broadcastReceiver);
     }
 
     @SuppressLint("MissingPermission")
@@ -428,5 +501,34 @@ public class BluetoothService {
     }
     public void onActivityResult(int requestCode, int resultCode){
         permissionChecker.onActivityResult(requestCode, resultCode);
+    }
+    @SuppressLint("MissingPermission")
+    private void discoverUnknownDevices(){
+        if (!bluetoothAdapter.isDiscovering()) {
+            IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+            bluetoothActivity.registerReceiver(broadcastReceiver, filter);
+            bluetoothAdapter.startDiscovery();
+        }
+    }
+
+    /**
+     * Adds paired devices to deviceList.
+     * @param isSelectOnlyAvaible choose, if you want to add only devices, you can access(True), or from every paired device(False).
+     */
+    @SuppressLint("MissingPermission")
+    private void discoverPairedDevices(boolean isSelectOnlyAvaible){
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        if (pairedDevices.size() > 0) {
+            for (BluetoothDevice device : pairedDevices) {
+                if (isSelectOnlyAvaible) {
+                    if (device.getBondState() == BluetoothDevice.BOND_BONDED) {   //TODO - getBondState doesn't fix it.
+                        deviceList.add(device);
+                    }
+                } else {
+                    deviceList.add(device);
+                }
+                UpdateDeviceListUI();
+            }
+        }
     }
 }

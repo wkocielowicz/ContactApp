@@ -23,6 +23,7 @@ public class MainActivity extends LanguageActivity implements IActivity {
 
     private Button goToContactActivityButton;
     private Button changeLanguageButton;
+    private Button goToBluetoothActivityButton;
     private AdManager adManager;
 
     private ActivityModeEnum mode;
@@ -59,7 +60,7 @@ public class MainActivity extends LanguageActivity implements IActivity {
 
         goToContactActivityButton = findViewById(R.id.go_to_contact_activity_button);
         changeLanguageButton = findViewById(R.id.change_language_button);
-
+        goToBluetoothActivityButton = findViewById(R.id.go_to_bluetooth_activity_button);
     }
 
     /**
@@ -77,6 +78,10 @@ public class MainActivity extends LanguageActivity implements IActivity {
             } else {
                 changeLanguage("pl");
             }
+        });
+
+        goToBluetoothActivityButton.setOnClickListener(view -> {
+            goToBluetoothActivity();
         });
     }
 
@@ -98,6 +103,15 @@ public class MainActivity extends LanguageActivity implements IActivity {
      */
     private void goToContactActivity() {
         Intent intent = new Intent(MainActivity.this, ContactActivity.class);
+        intent.putExtra("mode", ActivityModeEnum.VIEW);
+        startActivity(intent);
+    }
+
+    /**
+     * Navigates to the BluetoothActivity.
+     */
+    private void goToBluetoothActivity() {
+        Intent intent = new Intent(MainActivity.this, BluetoothActivity.class);
         intent.putExtra("mode", ActivityModeEnum.VIEW);
         startActivity(intent);
     }

@@ -22,4 +22,11 @@
         android:text="@string/mainSwitchLanguage"
         android:layout_marginTop="16dp"/>
 
+    <Button
+        android:id="@+id/go_to_bluetooth_activity_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bluetooth"
+        android:layout_marginTop="16dp"/>
+
 </LinearLayout>

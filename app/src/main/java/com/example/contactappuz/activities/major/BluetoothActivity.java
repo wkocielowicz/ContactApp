@@ -1,4 +1,4 @@
-package com.example.contactappuz;
+package com.example.contactappuz.activities.major;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,16 +9,20 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 
-import com.example.contactappuz.util.BluetoothService;
-import com.example.contactappuz.util.PermissionChecker;
+import com.example.contactappuz.R;
+import com.example.contactappuz.logic.BluetoothManager;
+import com.example.contactappuz.util.enums.BluetoothSearchTypeFlag;
 
+/**
+ * The activity that shows the user bluetooth devices, and allows the user to send data to them through
+ */
 public class BluetoothActivity extends AppCompatActivity {
     private static final String TAG = "BluetoothActivity";
     //static final UUID mUUID = UUID.fromString("");
 
-    Button  /*mbtnForward, mbtnBack, mbtnRight, mbtnLeft, mbtnStop,*/ mbtnDiscover, mbtnConnect, mbtnCollect, mbttSendDB;
+    Button  /*mbtnForward, mbtnBack, mbtnRight, mbtnLeft, mbtnStop, mbtnCollect, mbttSendDB,*/ mbtnDiscover, mbtnConnect;
 
-    BluetoothService bluetoothService;
+    BluetoothManager bluetoothManager;
     byte[] buffer = new byte[1024];
     int bytes;
     String Data="";
@@ -26,7 +30,7 @@ public class BluetoothActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        bluetoothService.onActivityResult(requestCode, resultCode);
+        bluetoothManager.onActivityResult(requestCode, resultCode);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -35,18 +39,18 @@ public class BluetoothActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
 
-        bluetoothService = new BluetoothService(this);
+        bluetoothManager = new BluetoothManager(this);
 
         /*ApiClient klient = new ApiClient();
         mbtnForward = findViewById(R.id.btnforward);
         mbtnBack    = findViewById(R.id.btnBack);
         mbtnLeft    = findViewById(R.id.btnLeft);
         mbtnRight   = findViewById(R.id.btnRight);
-        mbtnStop   = findViewById(R.id.btnStop);*/
+        mbtnStop   = findViewById(R.id.btnStop);
+        mbtnCollect = findViewById(R.id.btnCollect);
+        mbttSendDB = findViewById(R.id.btnSendDB);*/
         mbtnDiscover   = findViewById(R.id.btnDiscover);
         mbtnConnect = findViewById(R.id.btnConnect);
-        mbtnCollect = findViewById(R.id.btnCollect);
-        mbttSendDB = findViewById(R.id.btnSendDB);
 
 
 /*        mbtnConnect.setOnClickListener(new View.OnClickListener() {
@@ -79,18 +83,20 @@ public class BluetoothActivity extends AppCompatActivity {
 
         });*/
 
-        mbttSendDB.setOnClickListener(view -> startThread(Data));
+        //mbttSendDB.setOnClickListener(view -> startThread(Data));
+        //mbtnCollect.setOnClickListener(view -> bluetoothManager.mbtnCollect());
 //        mbtnConnect.setOnClickListener(view -> AsyncTask.execute());
-        mbtnConnect.setOnClickListener(view -> bluetoothService.mbtnConnect());
+        mbtnConnect.setOnClickListener(view -> bluetoothManager.mbtnConnect());
 //        touchEventHelper.setButtonOnTouchListener(mbtnForward, 70, 83);
-        mbtnDiscover.setOnClickListener(view -> bluetoothService.mbtnDiscover(this));
-        mbtnCollect.setOnClickListener(view -> bluetoothService.mbtnCollect());
+        mbtnDiscover.setOnClickListener(view -> bluetoothManager.Discover(new BluetoothSearchTypeFlag(BluetoothSearchTypeFlag.UNKNOWN_DEVICES | BluetoothSearchTypeFlag.ALL_PAIRED_DEVICES)));
+        bluetoothManager.Discover(new BluetoothSearchTypeFlag(BluetoothSearchTypeFlag.AVAILABLE_PAIRED_DEVICES));
 
     }
 
     @Override
     protected void onDestroy() {
-        bluetoothService.closeBluetoothSocket();
+        bluetoothManager.CloseBluetoothSocket();
+        bluetoothManager.CancelDiscovery();
         super.onDestroy();
     }
 
