@@ -245,7 +245,7 @@ public class BluetoothManager {
 
     @SuppressLint("MissingPermission")
     public void mbtnConnect() {
-        bluetoothClientSocket = null;   //todo nie wiem, co to zmieni (sprawdzę późńiej)
+        /*bluetoothClientSocket = null;   //todo nie wiem, co to zmieni (sprawdzę późńiej)
         try {
             permissionChecker.checkBluetoothLocationPermission();
 
@@ -254,10 +254,32 @@ public class BluetoothManager {
 //                    touchEventHelper = new TouchEventHelper(bluetoothSocket);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
+        connectThread.start();
     }
 
-    public void startBluetoothServer() {
+    /**
+     * Start the chat service. Specifically start AcceptThread to begin a
+     * session in listening (server) mode. Called by the Activity onResume()
+     */
+    public synchronized void start() {
+
+        //acceptThread.start();
+        // Cancel any thread attempting to make a connection
+        if (connectThread != null) {
+            connectThread.cancel();
+            connectThread = null;
+        }
+
+        // Cancel any thread currently running a connection
+        if (connectedThread != null) {
+            connectedThread.cancel();
+            connectedThread = null;
+        }
+
+    }
+
+        public void startBluetoothServer() {
         permissionChecker.checkBluetoothLocationPermission();
         acceptThread = new AcceptBluetoothThread(bluetoothAdapter);
     }
