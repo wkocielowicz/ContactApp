@@ -209,7 +209,6 @@ public class PermissionChecker {
             if (resultCode == RESULT_OK) {
                 // Lokalizacja została włączona przez użytkownika
                 runRunnableArrayList(localisationEnabledRunnable);
-
                 Log.e(TAG, "GPS-enabled");
             } else {
                 // Użytkownik odrzucił włączenie lokalizacji
@@ -222,6 +221,10 @@ public class PermissionChecker {
                 Log.e(TAG, "BT-enabled");
             } else {
                 // Użytkownik odrzucił włączenie bluetooth
+                ShowBluetoothRequestDialog(
+                        this::requestBluetoothPermission,
+                        ()->{}//activity::finish
+                );
                 Log.e(TAG, "BT-disabled");
             }
         }

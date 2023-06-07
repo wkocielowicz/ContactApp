@@ -159,7 +159,7 @@ public class BluetoothManager {
         deviceList.clear();
         deviceListAdapter.clear();
         previousDeviceListSize = 0;
-
+            //TODO make some popups appear less often
         if(availableModes.containFlag(BluetoothSearchTypeFlag.UNKNOWN_DEVICES)){
             permissionChecker.checkBluetoothLocationPermission(() ->
                     permissionChecker.requestLocationEnable(
@@ -177,17 +177,11 @@ public class BluetoothManager {
             );
             //It doesn't work properly
         }
-
     }
 
-    /*private Runnable CompressRunnables(ArrayList<Runnable> runnables){
-        return new Thread(() -> {
-            for (Runnable runnable : runnables) {
-            runnable.run();
-        }
-        });
-    }*/
-
+    /**
+     * Apply visual changes to the UI
+     */
     @SuppressLint("MissingPermission")
     private void UpdateDeviceListUI(){
         int currentSize = deviceList.size();
@@ -219,13 +213,18 @@ public class BluetoothManager {
         }
     };
 
+    /**
+     * Close the every connection, that was opened meanwhile using bluetooth
+     */
     public void CloseBluetooth(){
         CloseBluetoothSocket();
         CancelDiscovery();
     }
     public void CloseBluetoothSocket(){
         try {
-            bluetoothClientSocket.close();
+            if (bluetoothClientSocket != null) {
+                bluetoothClientSocket.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -237,7 +236,11 @@ public class BluetoothManager {
             // Przerwij wyszukiwanie urządzeń Bluetooth
             bluetoothAdapter.cancelDiscovery();
         }
-        bluetoothActivity.unregisterReceiver(broadcastReceiver);
+        try {
+            bluetoothActivity.unregisterReceiver(broadcastReceiver);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @SuppressLint("MissingPermission")
