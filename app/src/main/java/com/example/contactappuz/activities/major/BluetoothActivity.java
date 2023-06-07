@@ -1,5 +1,6 @@
 package com.example.contactappuz.activities.major;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,7 +21,7 @@ public class BluetoothActivity extends AppCompatActivity {
     private static final String TAG = "BluetoothActivity";
     //static final UUID mUUID = UUID.fromString("");
 
-    Button  /*mbtnForward, mbtnBack, mbtnRight, mbtnLeft, mbtnStop, mbtnCollect, mbttSendDB,*/ mbtnDiscover, mbtnConnect;
+    Button  /*mbtnForward, mbtnBack, mbtnRight, mbtnLeft, mbtnStop, mbtnCollect, mbttSendDB,*/ mbtnBroadcast, mbtnDiscover, mbtnConnect;
 
     BluetoothManager bluetoothManager;
     byte[] buffer = new byte[1024];
@@ -33,6 +34,13 @@ public class BluetoothActivity extends AppCompatActivity {
         bluetoothManager.onActivityResult(requestCode, resultCode);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(!bluetoothManager.onRequestPermissionsResult(requestCode, grantResults)){
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,61 +50,26 @@ public class BluetoothActivity extends AppCompatActivity {
         bluetoothManager = new BluetoothManager(this);
 
         /*ApiClient klient = new ApiClient();
-        mbtnForward = findViewById(R.id.btnforward);
-        mbtnBack    = findViewById(R.id.btnBack);
-        mbtnLeft    = findViewById(R.id.btnLeft);
-        mbtnRight   = findViewById(R.id.btnRight);
-        mbtnStop   = findViewById(R.id.btnStop);
         mbtnCollect = findViewById(R.id.btnCollect);
         mbttSendDB = findViewById(R.id.btnSendDB);*/
+        mbtnBroadcast = findViewById(R.id.btnBroadcastBt);
         mbtnDiscover   = findViewById(R.id.btnDiscover);
         mbtnConnect = findViewById(R.id.btnConnect);
-
-
-/*        mbtnConnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                    AsyncTask.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                klient.post("mleko");
-                                klient.close();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                    });
-            }
-        });*/
-        /*AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    klient.post("Inicjalizacja");
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-        });*/
 
         //mbttSendDB.setOnClickListener(view -> startThread(Data));
         //mbtnCollect.setOnClickListener(view -> bluetoothManager.mbtnCollect());
 //        mbtnConnect.setOnClickListener(view -> AsyncTask.execute());
+        mbtnBroadcast.setOnClickListener(view -> bluetoothManager.startBluetoothServer());
         mbtnConnect.setOnClickListener(view -> bluetoothManager.mbtnConnect());
 //        touchEventHelper.setButtonOnTouchListener(mbtnForward, 70, 83);
         mbtnDiscover.setOnClickListener(view -> bluetoothManager.Discover(new BluetoothSearchTypeFlag(BluetoothSearchTypeFlag.UNKNOWN_DEVICES | BluetoothSearchTypeFlag.ALL_PAIRED_DEVICES)));
-        bluetoothManager.Discover(new BluetoothSearchTypeFlag(BluetoothSearchTypeFlag.AVAILABLE_PAIRED_DEVICES));
 
+        bluetoothManager.Discover(new BluetoothSearchTypeFlag(BluetoothSearchTypeFlag.AVAILABLE_PAIRED_DEVICES));
     }
 
     @Override
     protected void onDestroy() {
-        bluetoothManager.CloseBluetoothSocket();
-        bluetoothManager.CancelDiscovery();
+        bluetoothManager.CloseBluetooth();
         super.onDestroy();
     }
 

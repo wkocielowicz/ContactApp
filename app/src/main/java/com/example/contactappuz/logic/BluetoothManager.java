@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,7 +14,6 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -22,7 +22,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.example.contactappuz.R;
+import com.example.contactappuz.util.AcceptBluetoothThread;
+import com.example.contactappuz.util.ConnectBluetoothThread;
 import com.example.contactappuz.util.ConnectedBluetoothThread;
 import com.example.contactappuz.util.PermissionChecker;
 import com.example.contactappuz.util.enums.BluetoothSearchTypeFlag;
@@ -37,268 +41,35 @@ import java.util.UUID;
 
 public class BluetoothManager {
     private static final String TAG = "BluetoothManager";
-    private static final int REQUEST_ENABLE_BT = 1;
 
     public interface MessageConstants {
         public static final int MESSAGE_READ = 0;
         public static final int MESSAGE_WRITE = 1;
         public static final int MESSAGE_TOAST = 2;
     }
+    private AcceptBluetoothThread acceptThread;
+    private ConnectBluetoothThread connectThread;
     private ConnectedBluetoothThread connectedThread;
 
     public static final UUID mUUID = UUID.fromString("69135e98-da96-4fce-9219-5da65a4909ea");
     byte[] buffer = new byte[1024];
     int bytes;
     String Data="";
-        //todo Send
-    /*
-    private BluetoothAdapter bluetoothAdapter;
-    private ArrayAdapter<String> deviceListAdapter;
-    private ArrayList<BluetoothDevice> deviceList = new ArrayList<>();
-    private ListView deviceListView;
-    //private String uuidString = "INSERT_YOUR_UUID_HERE";
-    private BluetoothDevice selectedDevice;
-    private BluetoothSocket socket;
-    private OutputStream outputStream;
-    private InputStream inputStream;
-    private volatile boolean stopWorker;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_send);
-
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        deviceListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-        deviceListView = findViewById(R.id.deviceListView);
-        deviceListView.setAdapter(deviceListAdapter);
-        deviceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedDevice = deviceList.get(position);
-                connectToDevice();
-            }
-        });
-    }
-
-    public void send(View view) {
-        String message = "To jest testowy tekst";
-
-        try {
-            outputStream.write(message.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void onDiscoverClick(View view) {
-        if (!bluetoothAdapter.isDiscovering()) {
-            deviceList.clear();
-            deviceListAdapter.clear();
-            IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(broadcastReceiver, filter);
-            bluetoothAdapter.startDiscovery();
-        }
-    }
-    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                deviceList.add(device);
-                deviceListAdapter.add(device.getName() + "\n" + device.getAddress());
-                deviceListAdapter.notifyDataSetChanged();
-            }
-        }
-    };
-
-    public void connectToDevice() {
-        socket = null;
-        try {
-            socket = selectedDevice.createRfcommSocketToServiceRecord(mUUID);
-            socket.connect();
-            outputStream = socket.getOutputStream();
-            inputStream = socket.getInputStream();
-            beginListenForData();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-*/
-    //todo Receive
-    /*
-    private BluetoothAdapter bluetoothAdapter;
-    private BroadcastReceiver broadcastReceiver;
-    private AcceptThread accept;
-    private ConnectedThread connected;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_receive);
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        // Zainicjuj BroadcastReceiver
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    // Znaleziono urządzenie Bluetooth
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    Toast.makeText(context, "Znaleziono urządzenie: " + device.getName(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        };
-
-        // Uruchom wątek nasłuchujący
-        accept = new AcceptThread();
-        accept.start();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        accept.cancel();
-        if (connected != null) {
-            connected.cancel();
-        }
-    }
-
-    private class AcceptThread extends Thread {
-        private BluetoothServerSocket serverSocket;
-        private BluetoothSocket socket;
-        private InputStream inputStream;
-        public AcceptThread() {
-            try {
-                // Utwórz serwer Bluetooth
-                serverSocket = bluetoothAdapter.listenUsingRfcommWithServiceRecord("Nazwa usługi", mUUID); //TODO uuid
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void run() {
-            try {
-                // Oczekuj na połączenie z urządzeniem
-                socket = serverSocket.accept();
-                inputStream = socket.getInputStream();
-
-                // Odczytuj dane z wejścia
-                byte[] buffer = new byte[1024];
-                int bytes;
-                while (true) {
-                    bytes = inputStream.read(buffer);
-                    String message = new String(buffer, 0, bytes);
-                    //runOnUiThread(() -> {
-                    //    textViewReceived.setText(message);
-                    //    Toast.makeText(ReceiveActivity.this, "Otrzymano wiadomość: " + message, Toast.LENGTH_SHORT).show();
-                    //});
-                    Toast.makeText(ReceiveActivity.this, "Otrzymano wiadomość: " + message, Toast.LENGTH_SHORT).show();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void cancel() {
-            try {
-                serverSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private class ConnectedThread extends Thread {
-        private BluetoothSocket socket;
-        private OutputStream outputStream;
-
-        public ConnectedThread(BluetoothSocket socket) {
-            try {
-                this.socket = socket;
-                this.outputStream = socket.getOutputStream();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void run() {
-            try {
-                String message = "Wiadomość testowa";
-                outputStream.write(message.getBytes());
-                outputStream.flush();
-                runOnUiThread(() -> Toast.makeText(ReceiveActivity.this, "Wysłano wiadomość: " + message, Toast.LENGTH_SHORT).show());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void cancel() {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void onSendClick(View view) {
-        if (bluetoothAdapter.isEnabled()) {
-            // Sprawdź, czy urządzenie jest sparowane
-            Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-            if (pairedDevices.size() > 0) {
-                BluetoothDevice device = pairedDevices.iterator().next();
-                try {
-                    // Utwórz socket Bluetooth i nawiąż połączenie z urządzeniem
-                    BluetoothSocket socket = device.createRfcommSocketToServiceRecord(mUUID));  //TODO uuid
-                    socket.connect();
-
-                    // Uruchom wątek do wysyłania wiadomości
-                    connected = new ConnectedThread(socket);
-                    connected.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public void onDiscoverClick(View view) {
-            if (!bluetoothAdapter.isDiscovering()) {
-// Wyszukaj urządzenia Bluetooth
-                IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-                registerReceiver(broadcastReceiver, filter);
-                bluetoothAdapter.startDiscovery();
-            }
-        }
-
-        public void onCancelDiscoveryClick(View view) {
-            if (bluetoothAdapter.isDiscovering()) {
-// Przerwij wyszukiwanie urządzeń Bluetooth
-                bluetoothAdapter.cancelDiscovery();
-                unregisterReceiver(broadcastReceiver);
-            }
-        }
-*/
-    //todo END
-
     PermissionChecker permissionChecker;// = new PermissionChecker(this);
 
-    private final BluetoothAdapter bluetoothAdapter;
+    private BluetoothAdapter bluetoothAdapter;
     private BluetoothDevice selectedDevice;
-    private BluetoothSocket bluetoothSocket = null;
+    private BluetoothServerSocket bluetoothServerSocket = null;
+    private BluetoothSocket bluetoothClientSocket = null;
     private ArrayAdapter<String> deviceListAdapter;
     private final ArrayList<BluetoothDevice> deviceList = new ArrayList<>();
     private ListView deviceListView;
 
-    //private String uuidString = "INSERT_YOUR_UUID_HERE";
     private OutputStream outputStream;
     private InputStream inputStream;
     private volatile boolean stopWorker;
 
     private static int previousDeviceListSize;
-    private Handler handler = new Handler();
     private Activity bluetoothActivity;
 
     @SuppressLint("MissingPermission")
@@ -311,14 +82,8 @@ public class BluetoothManager {
             bluetoothActivity.finish();      //TODO warto zareagować na to lepiej
             return;
         }
-        permissionChecker = new PermissionChecker(context);
-        permissionChecker.checkPermissions();       //TODO do poprawy - potrzebna obsługa przypadku z niepowodzeniem
-
-
-        if (!bluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            bluetoothActivity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);     //TODO do rozwiązania
-        }
+        permissionChecker = new PermissionChecker(bluetoothActivity);
+        //permissionChecker.checkBluetoothPermission();       //TODO do poprawy - potrzebna obsługa przypadku z niepowodzeniem
 
         //selectedDevice = bluetoothAdapter.getRemoteDevice("");//TODO do poprawy - szukaj i sparuj urządzenia
 
@@ -330,8 +95,6 @@ public class BluetoothManager {
             selectedDevice = deviceList.get(position);
 
             colorAccent(parent, view, position, context);
-
-            //wyzerowanie koloru tła dla innych elementów
             //connectToDevice();
             //mbtnConnect();        //todo pora na wciśnięcie połączenia
         });
@@ -398,14 +161,32 @@ public class BluetoothManager {
         previousDeviceListSize = 0;
 
         if(availableModes.containFlag(BluetoothSearchTypeFlag.UNKNOWN_DEVICES)){
-            discoverUnknownDevices();
+            permissionChecker.checkBluetoothLocationPermission(() ->
+                    permissionChecker.requestLocationEnable(
+                            this::discoverUnknownDevices
+                    )
+            );
         }
         if(availableModes.containFlag(BluetoothSearchTypeFlag.ALL_PAIRED_DEVICES)){
-            discoverPairedDevices(false);
+            permissionChecker.requestBluetoothEnable(bluetoothAdapter, () ->
+                    discoverPairedDevices(false)
+            );
         }else if(availableModes.containFlag(BluetoothSearchTypeFlag.AVAILABLE_PAIRED_DEVICES)) {
-            discoverPairedDevices(true);    //It doesn't work properly
+            permissionChecker.requestBluetoothEnable(bluetoothAdapter, () ->
+                    discoverPairedDevices(true)
+            );
+            //It doesn't work properly
         }
+
     }
+
+    /*private Runnable CompressRunnables(ArrayList<Runnable> runnables){
+        return new Thread(() -> {
+            for (Runnable runnable : runnables) {
+            runnable.run();
+        }
+        });
+    }*/
 
     @SuppressLint("MissingPermission")
     private void UpdateDeviceListUI(){
@@ -444,7 +225,7 @@ public class BluetoothManager {
     }
     public void CloseBluetoothSocket(){
         try {
-            bluetoothSocket.close();
+            bluetoothClientSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -460,21 +241,27 @@ public class BluetoothManager {
     }
 
     @SuppressLint("MissingPermission")
-    public void mbtnConnect(){
-        //bluetoothSocket = null;   //todo nie wiem, co to zmieni (sprawdzę późńiej)
+    public void mbtnConnect() {
+        bluetoothClientSocket = null;   //todo nie wiem, co to zmieni (sprawdzę późńiej)
         try {
-            permissionChecker.checkPermissions();
-            bluetoothSocket = selectedDevice.createRfcommSocketToServiceRecord(mUUID);
-        //    bluetoothSocket.connect();
+            permissionChecker.checkBluetoothLocationPermission();
+
+            bluetoothClientSocket = selectedDevice.createRfcommSocketToServiceRecord(mUUID);
+            //    bluetoothSocket.connect();
 //                    touchEventHelper = new TouchEventHelper(bluetoothSocket);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public void startBluetoothServer() {
+        permissionChecker.checkBluetoothLocationPermission();
+        acceptThread = new AcceptBluetoothThread(bluetoothAdapter);
+    }
+
     public void mbtnCollect(){
         try {
-            OutputStream outputStream = bluetoothSocket.getOutputStream();
+            OutputStream outputStream = bluetoothClientSocket.getOutputStream();
             outputStream.write(67);   //C
 
             AsyncTask.execute(new Runnable() {
@@ -483,7 +270,7 @@ public class BluetoothManager {
                 public void run() {
                     InputStream inputStream = null;
                     try {
-                        inputStream = bluetoothSocket.getInputStream();
+                        inputStream = bluetoothClientSocket.getInputStream();
                         bytes = inputStream.read(buffer);
                         String incomingMessage = new String(buffer, 0, bytes);
                         Data= incomingMessage.replaceAll("(\\r|\\n)", "");
@@ -502,6 +289,9 @@ public class BluetoothManager {
     public void onActivityResult(int requestCode, int resultCode){
         permissionChecker.onActivityResult(requestCode, resultCode);
     }
+    public boolean onRequestPermissionsResult(int requestCode, @NonNull int[] grantResults) {
+        return permissionChecker.onRequestPermissionsResult(requestCode, grantResults, bluetoothAdapter);
+    }
     @SuppressLint("MissingPermission")
     private void discoverUnknownDevices(){
         if (!bluetoothAdapter.isDiscovering()) {
@@ -513,14 +303,14 @@ public class BluetoothManager {
 
     /**
      * Adds paired devices to deviceList.
-     * @param isSelectOnlyAvaible choose, if you want to add only devices, you can access(True), or from every paired device(False).
+     * @param isSelectOnlyAvailable choose, if you want to add only devices, you can access(True), or from every paired device(False).
      */
     @SuppressLint("MissingPermission")
-    private void discoverPairedDevices(boolean isSelectOnlyAvaible){
+    private void discoverPairedDevices(boolean isSelectOnlyAvailable){
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
-                if (isSelectOnlyAvaible) {
+                if (isSelectOnlyAvailable) {
                     if (device.getBondState() == BluetoothDevice.BOND_BONDED) {   //TODO - getBondState doesn't fix it.
                         deviceList.add(device);
                     }
