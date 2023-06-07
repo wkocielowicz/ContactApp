@@ -24,12 +24,12 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true">
 
-    <Button
-        android:id="@+id/go_to_contact_activity_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/mainGoToContactActivity"
-        android:layout_centerHorizontal="true" />
+        <Button
+            android:id="@+id/go_to_contact_activity_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mainGoToContactActivity"
+            android:layout_centerHorizontal="true" />
 
         <Button
             android:id="@+id/change_language_button"
@@ -44,28 +44,30 @@
             android:id="@+id/go_to_bluetooth_activity_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/change_language_button"
+            android:layout_marginTop="16dp"
             android:text="Bluetooth"
-            android:layout_marginTop="16dp"/>
+            android:layout_centerHorizontal="true"/>
 
         <Button
             android:id="@+id/go_to_statistics_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/change_language_button"
+            android:layout_below="@+id/go_to_bluetooth_activity_button"
             android:layout_marginTop="16dp"
             android:text="@string/mainStatistics"
             android:layout_centerHorizontal="true" />
 
-    </RelativeLayout>
+        <Button
+            android:id="@+id/logout_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/mainLogout" />
 
-    <Button
-        android:id="@+id/logout_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
-        android:text="@string/mainLogout" />
+    </RelativeLayout>
 
 </LinearLayout>
